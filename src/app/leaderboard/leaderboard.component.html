@@ -1,0 +1,14 @@
+<table class="table">
+  <tr>
+    <td>Team</td>
+    <td>Total Kills</td>
+    <td>Points</td>
+  </tr>
+  <ng-container *ngFor="let entry of leaderboard; let i = index">
+    <tr>
+      <td>{{ entry.team }}</td>
+      <td>{{ entry.killCount }}</td>
+      <td>{{ entry.points }}</td>
+    </tr>
+  </ng-container>
+</table>

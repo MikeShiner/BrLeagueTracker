@@ -6,10 +6,10 @@ export const environment = {
   production: false,
   apiKey: '4eddc983-a606-4b87-bebd-53bc71fba426',
   proxyUrl: 'http://localhost:8080',
-  startTime: 'Wed, 14 October 2020 12:15:00',
+  startTime: '2020-10-14T16:30:00Z',
   captains: [
     { platform: 'atvi', id: 'Warscyther', teamName: 'Brothers In Arms' },
-    { platform: 'psn', id: 'TAdams944', teamName: "Tim's rubbish squad" },
+    { platform: 'psn', id: 'TAdams944', teamName: 'Slavtastic' },
   ],
 };
 

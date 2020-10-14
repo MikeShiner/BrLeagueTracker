@@ -14,15 +14,12 @@ export class TrackerService {
 
   getMatches(captain: Captain): Observable<Match[]> {
     return this._http
-      .get(
-        `${environment.proxyUrl}/https://api.tracker.gg/api/v1/warzone/matches/${captain.platform}/${captain.id}`,
-        {
-          headers: {
-            'TRN-Api-Key': environment.apiKey,
-            'X-Requested-With': 'WarzoneApp',
-          },
-        }
-      )
+      .get(`${environment.proxyUrl}/https://api.tracker.gg/api/v1/warzone/matches/${captain.platform}/${captain.id}`, {
+        headers: {
+          'TRN-Api-Key': environment.apiKey,
+          'X-Requested-With': 'WarzoneApp',
+        },
+      })
       .pipe(
         map((res: any) => {
           console.log(res);
@@ -47,30 +44,22 @@ export class TrackerService {
           from(matches).pipe(
             mergeMap((matches: { matchId: string; team: string }) =>
               this._http
-                .get(
-                  `${environment.proxyUrl}/https://api.tracker.gg/api/v1/warzone/matches/${matches.matchId}`
-                )
+                .get(`${environment.proxyUrl}/https://api.tracker.gg/api/v1/warzone/matches/${matches.matchId}`)
                 .pipe(
                   filter((singleMatch: any) => {
                     let date = new Date(environment.startTime);
-                    console.log(date);
-                    return (
-                      singleMatch.data.metadata.timestamp * 1000 >=
-                      date.getTime()
-                    );
+                    // console.log(date);
+                    return singleMatch.data.metadata.timestamp * 1000 >= date.getTime();
                   }),
                   map((singleMatch: any) => {
                     let matchData = {
                       matchMetadata: singleMatch.data.metadata,
-                      players: singleMatch.data.segments.filter(
-                        (seg) => seg.attributes.team === matches.team
-                      ),
+                      players: singleMatch.data.segments.filter((seg) => seg.attributes.team === matches.team),
                     };
                     matchData.matchMetadata.totalKills = 0;
                     matchData.players.forEach((player) => {
                       matchData.matchMetadata.totalKills =
-                        matchData.matchMetadata.totalKills +
-                        player.stats.kills.value;
+                        matchData.matchMetadata.totalKills + player.stats.kills.value;
                     });
                     console.log('Match Data: ', matchData);
 
@@ -87,8 +76,8 @@ export class TrackerService {
         ),
         map((finalArray) => {
           // Select 5 oldest matches from the final list (from original 7 resolved matches)
-          console.log(finalArray.slice(1).slice(-5));
-          return finalArray.slice(1).slice(-5);
+          console.log('FinalArray', finalArray.slice(1).slice(-5));
+          return finalArray.slice(-5);
         })
       );
   }

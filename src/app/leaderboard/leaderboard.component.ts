@@ -22,9 +22,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
         let teamKillsScore = 0;
         let placementPoints = 0;
         team.data.forEach((match) => {
-          placementPoints += this.applyPlacementBonus(
-            match.players[0].metadata.placement.value
-          );
+          placementPoints += this.applyPlacementBonus(match.players[0].metadata.placement.value);
           let matchKills = 0;
           match.players.forEach((perf) => {
             teamKillCount += perf.stats.kills.value;
@@ -43,7 +41,7 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
       });
       console.log('LEADBOARD', leadboard);
       // Sort by score!
-      this.leaderboard = leadboard;
+      this.leaderboard = leadboard.sort((a, b) => (a.points - b.points) * -1);
     });
   }
 

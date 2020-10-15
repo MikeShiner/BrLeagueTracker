@@ -1,4 +1,7 @@
 <h1 class="text-center">{{ title }}</h1>
+<span class="m-2"
+  >Refresh in: <countdown #cd [config]="countConfig" (event)="handleCountdownEvent($event)"></countdown
+></span>
 <mat-tab-group>
   <mat-tab label="Leaderboard">
     <app-leaderboard [teamScoreboard$]="teamScoreboards$"></app-leaderboard>
@@ -6,10 +9,7 @@
   <mat-tab label="Team Scoreboards">
     <h3 class="text-center">Start Time: {{ startTime }}</h3>
     <div *ngFor="let entry of teamScoreboards$ | async">
-      <app-scoreboard
-        [captain]="entry.captain"
-        [matches]="entry.data"
-      ></app-scoreboard>
+      <app-scoreboard [captain]="entry.captain" [matches]="entry.data"></app-scoreboard>
     </div>
   </mat-tab>
 </mat-tab-group>

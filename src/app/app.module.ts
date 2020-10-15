@@ -7,15 +7,10 @@ import { ScoreboardComponent } from './scoreboard/scoreboard.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTabsModule } from '@angular/material/tabs';
 import { LeaderboardComponent } from './leaderboard/leaderboard.component';
+import { CountdownModule } from 'ngx-countdown';
 @NgModule({
   declarations: [AppComponent, ScoreboardComponent, LeaderboardComponent],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    MatTabsModule,
-  ],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, BrowserAnimationsModule, MatTabsModule, CountdownModule],
   providers: [],
   bootstrap: [AppComponent],
 })

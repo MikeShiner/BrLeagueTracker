@@ -24,6 +24,7 @@
     "boostrap": "^2.0.0",
     "bootstrap": "^4.5.2",
     "cors-anywhere": "^0.4.3",
+    "ngx-countdown": "^10.0.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"

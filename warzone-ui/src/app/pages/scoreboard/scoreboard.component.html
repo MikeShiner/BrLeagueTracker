@@ -50,6 +50,12 @@
                               >]
                             </span>
                             <span class="playerName"></span>{{ player.name }}
+                            <span
+                              *ngIf="
+                                player.name === team.captain.id.split('#')[0]
+                              "
+                              ><i class="far fa-flag captain-mark"></i>
+                            </span>
                           </td>
                           <td class="text-center">{{ player.kills }}</td>
                           <td class="text-center">{{ player.deaths }}</td>

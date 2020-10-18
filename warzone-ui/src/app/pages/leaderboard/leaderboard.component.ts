@@ -9,5 +9,9 @@ import { TrackerService } from "src/app/services/tracker.service";
 export class LeaderboardComponent implements OnInit {
   constructor(public trackerService: TrackerService) {}
 
+  fakeArray(length: number) {
+    return new Array(length);
+  }
+
   ngOnInit(): void {}
 }

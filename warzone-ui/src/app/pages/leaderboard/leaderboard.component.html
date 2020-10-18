@@ -27,7 +27,23 @@
                   <tr>
                     <td>{{ entry.team }}</td>
                     <td class="text-center">{{ entry.totalKills }}</td>
-                    <td class="text-center">{{ entry.gamesPlayed }}</td>
+                    <td class="text-center">
+                      <ng-container
+                        *ngFor="let entry of fakeArray(entry.gamesPlayed)"
+                      >
+                        <i class="fas fa-check-circle gamePlayedTick"></i>
+                      </ng-container>
+                      <ng-container
+                        *ngFor="
+                          let entry of fakeArray(
+                            trackerService.config.numberOfGames -
+                              entry.gamesPlayed
+                          )
+                        "
+                      >
+                        <i class="far fa-circle"></i>
+                      </ng-container>
+                    </td>
                     <td class="text-center">{{ entry.points }}</td>
                   </tr>
                 </ng-container>

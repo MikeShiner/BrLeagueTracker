@@ -44,7 +44,7 @@ export class TrackerService {
 
   private updateTeamScoreboard(scorebaord: TeamScoreboard) {
     const index = this._teamScoreboard.findIndex(
-      (ts) => ts.captain.id === scorebaord.captain.id
+      (ts) => ts.captain.teamName === scorebaord.captain.teamName
     );
     this._teamScoreboard[index] = scorebaord;
     this.teamScoreboard$.next(this._teamScoreboard);

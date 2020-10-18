@@ -10,14 +10,10 @@ import { TeamScoreboard } from "./models/server-models";
 })
 export class TrackerService {
   private _leaderboard: TeamScoreboard[] = [];
-  private leaderboard$: BehaviorSubject<TeamScoreboard[]> = new BehaviorSubject(
-    []
-  );
+  leaderboard$: BehaviorSubject<TeamScoreboard[]> = new BehaviorSubject([]);
 
   private _teamScoreboard: TeamScoreboard[];
-  private teamScoreboard$: BehaviorSubject<
-    TeamScoreboard[]
-  > = new BehaviorSubject([]);
+  teamScoreboard$: BehaviorSubject<TeamScoreboard[]> = new BehaviorSubject([]);
 
   private _config: Config;
   get config() {
@@ -29,8 +25,16 @@ export class TrackerService {
     this.ws = new WebSocket(`ws://${environment.api}`);
     this.ws.onmessage = ({ data }) => {
       let msg = JSON.parse(data);
+      console.log(msg);
       if (msg.type === "config") {
         this._config = msg.config;
+      } else if (msg.type === "leaderboard") {
+        console.log(msg);
+        this._teamScoreboard = msg.leaderboard;
+        this.leaderboard$.next(msg.leaderboard);
+      } else if (msg.type === "teamScoreboards") {
+        this._teamScoreboard = msg.scoreboard;
+        this.teamScoreboard$.next(msg.scoreboard);
       }
     };
   }

@@ -7,7 +7,7 @@ import { TrackerService } from "src/app/services/tracker.service";
   styleUrls: ["./leaderboard.component.scss"],
 })
 export class LeaderboardComponent implements OnInit {
-  constructor(public tracker: TrackerService) {}
+  constructor(public trackerService: TrackerService) {}
 
   ngOnInit(): void {}
 }

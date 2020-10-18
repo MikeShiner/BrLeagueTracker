@@ -98,7 +98,10 @@ const broadcastData = (data: string) => {
 };
 
 const addToScoreboardCache = (teamScoreboard: TeamScoreboard) => {
-  const index = scoreboardsCache.indexOf(teamScoreboard);
+  if (scoreboardsCache.length > config.captains.length * config.numberOfGames) {
+    scoreboardsCache = [];
+  }
+  const index: number = scoreboardsCache.findIndex((ts) => ts.captain.id === teamScoreboard.captain.id);
   if (index !== -1) {
     scoreboardsCache[index] = teamScoreboard;
     return;

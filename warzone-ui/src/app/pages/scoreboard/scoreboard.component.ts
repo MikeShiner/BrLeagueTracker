@@ -7,7 +7,9 @@ import { TrackerService } from "src/app/services/tracker.service";
   styleUrls: ["./scoreboard.component.scss"],
 })
 export class ScoreboardComponent implements OnInit {
-  constructor(private tracker: TrackerService) {}
+  constructor(private trackerService: TrackerService) {
+    this.trackerService.teamScoreboard$.subscribe((data) => console.log(data));
+  }
 
   ngOnInit(): void {}
 }

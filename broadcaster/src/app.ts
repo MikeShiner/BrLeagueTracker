@@ -59,7 +59,7 @@ const getAllTeamScoreboards = async (captain: Captain): Promise<TeamScoreboard> 
     // Broadcast update as soon as we get it
     broadcastData(
       JSON.stringify({
-        type: 'teamScoreboards',
+        type: 'teamScoreboardUpdate',
         teamscoreboard,
       })
     );

@@ -2,6 +2,13 @@
   <div class="row">
     <div class="col-md-12">
       <div class="card card-plain">
+        <div class="card-header">
+          <h3 class="card-title">Week 2</h3>
+          <p class="category">
+            Start Time:
+            {{ tracker.config?.startTime | date: "d MMM y, h:mm:ss a" }}
+          </p>
+        </div>
         <div class="card-body">
           <div class="table-responsive">
             <table class="table tablesorter" id="">

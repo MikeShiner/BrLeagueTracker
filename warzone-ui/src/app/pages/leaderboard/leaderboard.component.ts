@@ -1,15 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
+import { TrackerService } from "src/app/services/tracker.service";
 
 @Component({
-  selector: 'app-leaderboard',
-  templateUrl: './leaderboard.component.html',
-  styleUrls: ['./leaderboard.component.scss']
+  selector: "app-leaderboard",
+  templateUrl: "./leaderboard.component.html",
+  styleUrls: ["./leaderboard.component.scss"],
 })
 export class LeaderboardComponent implements OnInit {
+  constructor(public tracker: TrackerService) {}
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }

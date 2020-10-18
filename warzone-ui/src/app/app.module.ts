@@ -12,8 +12,9 @@ import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { ComponentsModule } from "./components/components.module";
-import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
-import { ScoreboardComponent } from './pages/scoreboard/scoreboard.component';
+import { LeaderboardComponent } from "./pages/leaderboard/leaderboard.component";
+import { ScoreboardComponent } from "./pages/scoreboard/scoreboard.component";
+import { TrackerService } from "./services/tracker.service";
 
 @NgModule({
   imports: [
@@ -26,8 +27,13 @@ import { ScoreboardComponent } from './pages/scoreboard/scoreboard.component';
     AppRoutingModule,
     ToastrModule.forRoot(),
   ],
-  declarations: [AppComponent, AdminLayoutComponent, LeaderboardComponent, ScoreboardComponent],
-  providers: [],
+  declarations: [
+    AppComponent,
+    AdminLayoutComponent,
+    LeaderboardComponent,
+    ScoreboardComponent,
+  ],
+  providers: [TrackerService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

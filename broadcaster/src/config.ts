@@ -8,7 +8,7 @@ export interface Config {
 }
 
 export const config: Config = {
-  startTime: new Date('2020-10-15T18:30:00Z'),
+  startTime: new Date('2020-10-18T08:30:00Z'),
   numberOfGames: 5,
   refreshTimeSeconds: 120,
   captains: [

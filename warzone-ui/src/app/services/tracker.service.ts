@@ -2,6 +2,7 @@ import { ThrowStmt } from "@angular/compiler";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { environment } from "src/environments/environment";
+import { ScoreboardComponent } from "../pages/scoreboard/scoreboard.component";
 import { Config } from "./models/config";
 import { TeamScoreboard } from "./models/server-models";
 
@@ -35,7 +36,17 @@ export class TrackerService {
       } else if (msg.type === "teamScoreboards") {
         this._teamScoreboard = msg.scoreboard;
         this.teamScoreboard$.next(msg.scoreboard);
+      } else if (msg.type === "teamScoreboardUpdate") {
+        this.updateTeamScoreboard(msg.teamscoreboard);
       }
     };
+  }
+
+  private updateTeamScoreboard(scorebaord: TeamScoreboard) {
+    const index = this._teamScoreboard.findIndex(
+      (ts) => ts.captain.id === scorebaord.captain.id
+    );
+    this._teamScoreboard[index] = scorebaord;
+    this.teamScoreboard$.next(this._teamScoreboard);
   }
 }

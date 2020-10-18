@@ -1,3 +1,33 @@
+@import "~@angular/material/theming";
+
+@include mat-core();
+
+$angular-primary: mat-palette($mat-teal, 500, 100, 900);
+$angular-accent: mat-palette($mat-pink, A200, A100, A400);
+$angular-warn: mat-palette($mat-red);
+
+$angular-default-theme: mat-dark-theme(
+  $angular-primary,
+  $angular-accent,
+  $angular-warn
+);
+
+@include angular-material-theme($angular-default-theme);
+
+// $angular-dark-theme: mat-dark-theme(
+//   (
+//     color: (
+//       primary: $angular-primary,
+//       accent: $angular-accent,
+//       warn: $angular-warn,
+//     ),
+//   )
+// );
+
+// .darkMode {
+//   @include angular-material-color($angular-dark-theme);
+// }
+
 /* You can add global styles to this file, and also import other style files */
 // .table-responsive {
 //   overflow: hidden !important;
@@ -10,4 +40,13 @@
 .table-responsive {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }

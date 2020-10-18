@@ -9,50 +9,54 @@
           <h3 class="card-title">{{ team.captain.teamName }}</h3>
         </div>
         <div class="card-body">
-          <div
-            class="table-responsive"
-            *ngFor="let scoreboard of team.scoreboards"
-          >
-            <div class="metadata d-flex">
-              <h4>Placement: {{ scoreboard.metadata.placementDisplay }}</h4>
-              <h4 class="duration flex-grow-1 text-right">
-                {{ scoreboard.metadata.duration.displayValue }}
-              </h4>
-            </div>
+          <mat-tab-group mat-align-tabs="start">
+            <mat-tab
+              *ngFor="let scoreboard of team.scoreboards; let i = index"
+              label="Game {{ trackerService.config.numberOfGames - i }}"
+            >
+              <div class="table-responsive">
+                <div class="metadata d-flex">
+                  <h4>Placement: {{ scoreboard.metadata.placementDisplay }}</h4>
+                  <h4 class="duration flex-grow-1 text-right">
+                    {{ scoreboard.metadata.timestamp * 1000 | date: "h:mm a" }}
+                  </h4>
+                </div>
 
-            <table class="table tablesorter" id="">
-              <thead class="text-primary">
-                <tr>
-                  <th>Name</th>
-                  <th class="text-center">Kills</th>
-                  <th class="text-center">Deaths</th>
-                  <th class="text-center">K/D</th>
-                  <th class="text-center">Damage</th>
-                  <th class="text-center">Revives</th>
-                </tr>
-              </thead>
-              <tbody>
-                <ng-container *ngFor="let player of scoreboard.players">
-                  <tr>
-                    <td>
-                      <span class="clantag" *ngIf="player.clanTag"
-                        >[<span>{{ player.clanTag }}</span
-                        >]</span
-                      >
-                      <span class="playerName"></span>{{ player.name }}
-                    </td>
-                    <td class="text-center">{{ player.kills }}</td>
-                    <td class="text-center">{{ player.deaths }}</td>
-                    <td class="text-center">
-                      {{ player.kd | number: "1.2-2" }}
-                    </td>
-                    <td class="text-center">{{ player.damage }}</td>
-                    <td class="text-center">{{ player.revives }}</td>
-                  </tr>
-                </ng-container>
-              </tbody>
-            </table>
-          </div>
+                <table class="table tablesorter" id="">
+                  <thead class="text-primary">
+                    <tr>
+                      <th>Name</th>
+                      <th class="text-center">Kills</th>
+                      <th class="text-center">Deaths</th>
+                      <th class="text-center">K/D</th>
+                      <th class="text-center">Damage</th>
+                      <th class="text-center">Revives</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <ng-container *ngFor="let player of scoreboard.players">
+                      <tr>
+                        <td>
+                          <span class="clantag" *ngIf="player.clanTag"
+                            >[<span>{{ player.clanTag }}</span
+                            >]
+                          </span>
+                          <span class="playerName"></span>{{ player.name }}
+                        </td>
+                        <td class="text-center">{{ player.kills }}</td>
+                        <td class="text-center">{{ player.deaths }}</td>
+                        <td class="text-center">
+                          {{ player.kd | number: "1.2-2" }}
+                        </td>
+                        <td class="text-center">{{ player.damage }}</td>
+                        <td class="text-center">{{ player.revives }}</td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
         </div>
       </div>
     </div>

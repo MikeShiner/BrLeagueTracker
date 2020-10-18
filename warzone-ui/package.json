@@ -62,11 +62,13 @@
   "private": false,
   "dependencies": {
     "@angular/animations": "9.0.5",
+    "@angular/cdk": "^9.2.4",
     "@angular/common": "9.0.5",
     "@angular/compiler": "9.0.5",
     "@angular/core": "9.0.5",
     "@angular/forms": "9.0.5",
     "@angular/localize": "^9.0.5",
+    "@angular/material": "^9.2.4",
     "@angular/platform-browser": "9.0.5",
     "@angular/platform-browser-dynamic": "9.0.5",
     "@angular/router": "9.0.5",

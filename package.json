@@ -1,0 +1,22 @@
+{
+  "name": "brleague-warzone-parent",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build-app && npm run build-server",
+    "build-app": "(cd warzone-ui && ng build --prod) && cp -r warzone-ui/dist broadcaster/dist/ui",
+    "build-server": "(cd broadcaster && tsc)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikeShiner/BrLeagueTracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MikeShiner/BrLeagueTracker/issues"
+  },
+  "homepage": "https://github.com/MikeShiner/BrLeagueTracker#readme"
+}

@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm run build-dev && port=8086 node broadcaster/dist/server.js",
-    "build-dev": "npm run build-app-dev && npm run build-server",
-    "build": "npm run build-app && npm run build-server",
-    "build-app-prod": "(cd warzone-ui && ng build --prod) && rm -r broadcaster/dist/ui/*; cp -r warzone-ui/dist broadcaster/dist/ui",
-    "build-app-dev": "(cd warzone-ui && ng build) && rm -r broadcaster/dist/ui/*; cp -r warzone-ui/dist/* broadcaster/dist/ui/",
-    "build-server": "(cd broadcaster && tsc)"
+    "prod": "npm run build-all-prod && port=8086 node broadcaster/dist/server.js",
+    "dev": "npm run build-all-dev && port=8086 node broadcaster/dist/server.js",
+    "build-all-dev": "rm -r broadcaster/dist && npm run build-server && npm run build-app-dev",
+    "build-all-prod": "rm -r broadcaster/dist && npm run build-server && npm run build-app-prod",
+    "build-app-prod": "(cd warzone-ui && ng build --prod) && mkdir broadcaster/dist/ui && cp -r warzone-ui/dist/* broadcaster/dist/ui",
+    "build-app-dev": "(cd warzone-ui && ng build) && mkdir broadcaster/dist/ui && cp -r warzone-ui/dist/* broadcaster/dist/ui/",
+    "build-server": "(cd broadcaster && tsc && cp package.json dist/)",
+    "build-image": "npm run build-all-prod && docker build -t mikeshiner/brleagues-tracker:latest ."
   },
   "repository": {
     "type": "git",

@@ -17,6 +17,12 @@ export const ROUTES: RouteInfo[] = [
   {
     path: "/scoreboards",
     title: "Scoreboards",
+    icon: "icon-chart-bar-32",
+    class: "",
+  },
+  {
+    path: "/rules",
+    title: "Rules",
     icon: "icon-paper",
     class: "",
   },

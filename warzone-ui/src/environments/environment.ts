@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  api: "localhost:8086/updates",
+  // api: "localhost:8089/updates",
+  api: "brleagues.com/updates",
 };
 
 /*

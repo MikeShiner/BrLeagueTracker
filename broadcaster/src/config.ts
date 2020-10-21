@@ -8,7 +8,7 @@ export interface Config {
 }
 
 export const config: Config = {
-  startTime: new Date('2020-10-18T08:30:00Z'),
+  startTime: process.env.startTime ? new Date(process.env.startTime) : undefined,
   numberOfGames: 5,
   refreshTimeSeconds: 120,
   captains: [

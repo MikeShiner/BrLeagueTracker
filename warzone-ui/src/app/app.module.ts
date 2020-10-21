@@ -17,6 +17,7 @@ import { ScoreboardComponent } from "./pages/scoreboard/scoreboard.component";
 import { TrackerService } from "./services/tracker.service";
 
 import { MatTabsModule } from "@angular/material/tabs";
+import { RulesComponent } from './pages/rules/rules.component';
 @NgModule({
   imports: [
     BrowserAnimationsModule,
@@ -34,6 +35,7 @@ import { MatTabsModule } from "@angular/material/tabs";
     AdminLayoutComponent,
     LeaderboardComponent,
     ScoreboardComponent,
+    RulesComponent,
   ],
   providers: [TrackerService],
   bootstrap: [AppComponent],

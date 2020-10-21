@@ -31,7 +31,7 @@ export class TrackerService {
         this._config = msg.config;
       } else if (msg.type === "leaderboard") {
         console.log(msg);
-        this._teamScoreboard = msg.leaderboard;
+        this._leaderboard = msg.leaderboard;
         this.leaderboard$.next(msg.leaderboard);
       } else if (msg.type === "teamScoreboards") {
         this._teamScoreboard = msg.scoreboard;

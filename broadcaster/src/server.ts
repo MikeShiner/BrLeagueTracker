@@ -1,12 +1,9 @@
 'use strict';
+import process from 'process';
 import express from 'express';
-import { Application } from 'express';
 import expressWs from 'express-ws';
-import compression from 'compression';
-import { Runner } from './app';
-// import WebSocket from 'ws';
+import { Runner } from './runner';
 import { config } from './config';
-import ws from 'ws';
 
 export class Server {
   private app: any;
@@ -61,3 +58,8 @@ export class Server {
   }
 }
 const server = new Server(+process.env.port);
+
+process.on('SIGINT', () => {
+  console.info('Interrupted');
+  process.exit(0);
+});

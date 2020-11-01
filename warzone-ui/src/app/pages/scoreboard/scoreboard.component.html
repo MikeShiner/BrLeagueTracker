@@ -19,7 +19,10 @@
                 label="Game {{ team.scoreboards.length - i }}"
               >
                 <div class="table-responsive">
-                  <div class="matchMetadata d-flex">
+                  <div
+                    class="matchMetadata d-flex"
+                    [attr.data-matchId]="scoreboard.matchMetadata.matchId"
+                  >
                     <h4>
                       Placement: {{ scoreboard.matchMetadata.placementDisplay }}
                     </h4>
@@ -67,7 +70,8 @@
                     </tbody>
                   </table>
                   <h4 class="text-center">
-                    Match Points: {{ scoreboard.matchMetadata.totalPoints }}
+                    Match Points:
+                    {{ scoreboard.matchMetadata.totalPoints || 0 }}
                   </h4>
                 </div>
               </mat-tab>

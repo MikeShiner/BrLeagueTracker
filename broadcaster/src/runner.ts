@@ -161,8 +161,20 @@ export class Runner {
         gamesPlayed: team.scoreboards.length,
       });
     }
-    killboard = killboard.sort((a, b) => (a.kills - b.kills) * -1);
+    // Sorting & work out player's position
     leaderboard = leaderboard.sort((a, b) => (a.points - b.points) * -1);
+    killboard = killboard.sort((a, b) => (a.kills - b.kills) * -1);
+    let pos = 1;
+    let killsToBeat = 0;
+    killboard.forEach((e) => {
+      if (e.kills >= killsToBeat) {
+        e.pos = pos;
+      } else {
+        pos++;
+        e.pos = pos;
+      }
+      killsToBeat = e.kills;
+    });
     return { killboard, leaderboard };
   }
 

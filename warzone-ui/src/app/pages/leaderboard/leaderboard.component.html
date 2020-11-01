@@ -4,7 +4,7 @@
       <div class="card card-plain">
         <div class="card-header">
           <h3 class="card-title">
-            Week {{ trackerService.config?.weekNumber || 0 }}
+            Week {{ trackerService.config?.weekNumber || 0 }} Leaderboard
           </h3>
           <p class="category" *ngIf="!!trackerService.config?.startTime">
             Start Time:
@@ -55,6 +55,48 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card card-plain">
+        <div class="card-header">
+          <h3 class="card-title">Killboard</h3>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table tablesorter" id="">
+              <thead class="text-primary">
+                <tr>
+                  <th>Pos.</th>
+                  <th>Player</th>
+                  <th class="text-center">Total Kills</th>
+                  <th class="text-right">Team</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container
+                  *ngFor="let entry of trackerService.killboard$ | async"
+                >
+                  <tr>
+                    <td>{{ entry.pos }}</td>
+                    <td>{{ entry.name }}</td>
+                    <td class="text-center">{{ entry.kills }}</td>
+                    <td class="text-right">{{ entry.team }}</td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+          <ng-container *ngIf="(trackerService.killboard$ | async).length == 0">
+            <div class="row">
+              <div class="col-md-12">
+                <h4 class="text-center">Time to earn your freedom, soldier.</h4>
+              </div>
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>

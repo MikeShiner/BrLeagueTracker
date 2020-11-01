@@ -4,17 +4,24 @@ import { BehaviorSubject } from "rxjs";
 import { environment } from "src/environments/environment";
 import { ScoreboardComponent } from "../pages/scoreboard/scoreboard.component";
 import { Config } from "./models/config";
-import { TeamScoreboard } from "./models/server-models";
+import {
+  KillboardEntry,
+  LeaderboardEntry,
+  TeamScoreboard,
+} from "./models/server-models";
 
 @Injectable({
   providedIn: "root",
 })
 export class TrackerService {
-  private _leaderboard: TeamScoreboard[] = [];
-  leaderboard$: BehaviorSubject<TeamScoreboard[]> = new BehaviorSubject([]);
+  private _leaderboard: LeaderboardEntry[] = [];
+  leaderboard$: BehaviorSubject<LeaderboardEntry[]> = new BehaviorSubject([]);
 
   private _teamScoreboard: TeamScoreboard[];
   teamScoreboard$: BehaviorSubject<TeamScoreboard[]> = new BehaviorSubject([]);
+
+  private _killboard: KillboardEntry[];
+  killboard$: BehaviorSubject<KillboardEntry[]> = new BehaviorSubject([]);
 
   private _config: Config;
   get config() {
@@ -36,6 +43,9 @@ export class TrackerService {
       } else if (msg.type === "teamScoreboards") {
         this._teamScoreboard = msg.teamScoreboard;
         this.teamScoreboard$.next(msg.teamScoreboard);
+      } else if (msg.type === "killboard") {
+        this._killboard = msg.killboard;
+        this.killboard$.next(msg.killboard);
       }
     };
   }

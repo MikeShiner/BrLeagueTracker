@@ -2,6 +2,7 @@ export interface KillboardEntry {
   name: string;
   kills: number;
   team: string;
+  pos?: number;
 }
 
 export interface Captain {

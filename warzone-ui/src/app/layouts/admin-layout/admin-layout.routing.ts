@@ -6,6 +6,6 @@ import { ScoreboardComponent } from "src/app/pages/scoreboard/scoreboard.compone
 
 export const AdminLayoutRoutes: Routes = [
   { path: "scoreboards", component: ScoreboardComponent },
-  { path: "leaderboard", component: LeaderboardComponent },
+  { path: "leaderboards", component: LeaderboardComponent },
   { path: "rules", component: RulesComponent },
 ];

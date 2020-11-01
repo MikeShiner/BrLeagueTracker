@@ -1,3 +1,8 @@
+export interface KillboardEntry {
+  name: string;
+  kills: number;
+  team: string;
+}
 export interface LeaderboardEntry {
   team: string;
   totalKills: number;

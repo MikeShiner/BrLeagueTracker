@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/MikeShiner/BrLeagueTracker/issues"
   },
-  "homepage": "https://github.com/MikeShiner/BrLeagueTracker#readme"
+  "homepage": "https://github.com/MikeShiner/BrLeagueTracker#readme",
+  "dependencies": {
+    "call-of-duty-api": "^1.2.16"
+  }
 }

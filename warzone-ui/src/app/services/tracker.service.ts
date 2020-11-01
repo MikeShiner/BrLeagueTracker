@@ -34,19 +34,9 @@ export class TrackerService {
         this._leaderboard = msg.leaderboard;
         this.leaderboard$.next(msg.leaderboard);
       } else if (msg.type === "teamScoreboards") {
-        this._teamScoreboard = msg.scoreboard;
-        this.teamScoreboard$.next(msg.scoreboard);
-      } else if (msg.type === "teamScoreboardUpdate") {
-        this.updateTeamScoreboard(msg.teamscoreboard);
+        this._teamScoreboard = msg.teamScoreboard;
+        this.teamScoreboard$.next(msg.teamScoreboard);
       }
     };
-  }
-
-  private updateTeamScoreboard(scorebaord: TeamScoreboard) {
-    const index = this._teamScoreboard.findIndex(
-      (ts) => ts.captain.teamName === scorebaord.captain.teamName
-    );
-    this._teamScoreboard[index] = scorebaord;
-    this.teamScoreboard$.next(this._teamScoreboard);
   }
 }

@@ -1,98 +1,240 @@
-import { getMatches, getTeamboard } from './tracker';
-import { Captain, LeaderboardEntry, Match, TeamScoreboard } from './types';
-import { config } from './config';
-import WebSocket from 'ws';
-import expressWs from 'express-ws';
-
+import { BehaviorSubject } from 'rxjs';
+import { Config } from './server';
+import {
+  Captain,
+  KillboardEntry,
+  LeaderboardEntry,
+  Match,
+  MatchScoreboard,
+  PlayerScore,
+  TeamScoreboards,
+} from './types';
 export class Runner {
-  scoreboardsCache: TeamScoreboard[] = [];
-  leaderboardCache: LeaderboardEntry[] = [];
+  teamScoreboardUpdates$: BehaviorSubject<TeamScoreboards[]> = new BehaviorSubject<TeamScoreboards[]>([]);
+  leaderboardUpdates$: BehaviorSubject<LeaderboardEntry[]> = new BehaviorSubject<LeaderboardEntry[]>([]);
+  killboardUpdates$: BehaviorSubject<KillboardEntry[]> = new BehaviorSubject<KillboardEntry[]>([]);
 
-  constructor(private wss: expressWs.Instance) {
-    this.runFetcher.bind(this);
-    this.startPolling();
-  }
+  private API = require('call-of-duty-api')({ platform: 'battle' });
 
-  private async startPolling() {
-    setInterval(await this.runFetcher.bind(this), config.refreshTimeSeconds * 500);
-  }
+  constructor(private config: Config, private username: string, private password: string) {}
 
-  private async runFetcher() {
-    // Each team get matches
-    console.log('Running fetcher at ', new Date().getTime());
+  async runnerLoop() {
+    this.generateDefaultUpdates();
+    console.log('Runner loop started at ', new Date());
+    let teamScoreboardLocalCache = [];
+    for (let captain of this.config.captains) {
+      const captainsMatches: Match[] = await this.filterLast20Matches(captain);
+      const wholeTeamMatches: Match[][] = await this.loadFullDetailMatches(captain, captainsMatches);
+      const teamScoreboard: TeamScoreboards = this.calculateTeamScoreboards(captain, wholeTeamMatches);
 
-    // Fetch and emit all team scoreboards. Once finished, generate leadboard based on new set
-    let scoreboardPromises: Promise<TeamScoreboard>[] = [];
-    config.captains.forEach((captain) => scoreboardPromises.push(this.getAllTeamScoreboards(captain)), this);
-    const teamScoreboards = await Promise.all(scoreboardPromises);
-
-    // Generate Leaderboard
-    console.log('Generating leaderboard...');
-    this.broadcastData(
-      JSON.stringify({
-        type: 'leaderboard',
-        leaderboard: this.generateLeaderboard(teamScoreboards),
-      })
+      teamScoreboardLocalCache.push(teamScoreboard);
+      console.log('Captain ' + captain.id + ' completed.');
+    }
+    // Add collection to load cache for first WS pulls. Sort teams in alphabetical order.
+    teamScoreboardLocalCache = teamScoreboardLocalCache.sort((a, b) =>
+      a.captain.teamName.localeCompare(b.captain.teamName)
     );
+
+    let { killboard, leaderboard } = this.calculateLeaderboards(teamScoreboardLocalCache);
+    this.teamScoreboardUpdates$.next(teamScoreboardLocalCache);
+    this.killboardUpdates$.next(killboard);
+    this.leaderboardUpdates$.next(leaderboard);
   }
 
-  private generateLeaderboard(everyTeamScoreboard: TeamScoreboard[]) {
+  async login() {
+    console.log('Logging in..');
+    try {
+      const loginOutput = await this.API.login(this.username, this.password);
+      console.log(loginOutput);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  /**
+   * Produces 5 games from start time or latest 5 games. It will filter out blacklisted games.
+   * @param captain Captain to get last 5 games for.
+   */
+  private async filterLast20Matches(captain: Captain) {
+    let data = await this.API.MWcombatwz(captain.id, 'acti');
+
+    // Filter out any blacklisted matches
+    if (this.config.blacklistMatches && this.config.blacklistMatches.length > 0) {
+      data.matches = data.matches.filter((m: Match) => this.config.blacklistMatches.indexOf(m.matchID) === -1);
+    }
+
+    if (this.config.startTime) {
+      // Filter by startTime
+      data.matches = data.matches.filter((m: Match) => new Date(m.utcStartSeconds * 1000) > this.config.startTime);
+      // Select ealiest 5 games from startTime
+      data.matches = data.matches.slice(Math.max(data.matches.length - 5, 0));
+    } else {
+      // Otherwise just select latest 5 games
+      data.matches = data.matches.slice(0, 5);
+    }
+    return data.matches;
+  }
+
+  /**
+   * Produces full match details for each player in each game. Double array here is Game by Player Match.
+   * i.e.[[Player, Player, Player], [Game 2]]
+   * @param captain Captain
+   * @param matches 5 of the captain's matches to get full player details for
+   */
+  private async loadFullDetailMatches(captain: Captain, matches: Match[]) {
+    let teamPlayerMatches: Match[][] = [];
+    for (let match of matches) {
+      let fullMatch: { allPlayers: Match[] } = await this.API.MWFullMatchInfowz(match.matchID, 'acti');
+      let teamMatch: Match[] = fullMatch.allPlayers.filter((players) => players.player.team === match.player.team);
+      teamPlayerMatches.push(teamMatch);
+    }
+    return teamPlayerMatches;
+  }
+
+  private calculateTeamScoreboards(captain: Captain, gameByPlayerMatches: Match[][]) {
+    let teamScoreboard: TeamScoreboards = {
+      captain,
+      scoreboards: [],
+    };
+
+    gameByPlayerMatches.forEach((game: Match[]) => {
+      let matchScoreboard: MatchScoreboard = this.extractMatchMetadata(game[0]);
+      matchScoreboard.players = [];
+      game.forEach((playerMatch) => {
+        let playerScore: PlayerScore = {
+          name: playerMatch.player.username,
+          clanTag: playerMatch.player.clantag,
+          kills: playerMatch.playerStats.kills,
+          deaths: playerMatch.playerStats.deaths,
+          kd: playerMatch.playerStats.kdRatio,
+          damage: playerMatch.playerStats.damageDone,
+          revives: playerMatch.playerStats.objectiveReviver ?? 0,
+        };
+        matchScoreboard.players.push(playerScore);
+      });
+      let totalKills = matchScoreboard.players.reduce((a, b) => a + b.kills, 0);
+      matchScoreboard.matchMetadata.totalKills = totalKills;
+      matchScoreboard.matchMetadata.killPoints = this.applyKillCountBonus(totalKills);
+      matchScoreboard.matchMetadata.totalPoints =
+        matchScoreboard.matchMetadata.killPoints + matchScoreboard.matchMetadata.placementPoints;
+      teamScoreboard.scoreboards.push(matchScoreboard);
+    });
+    return teamScoreboard;
+  }
+
+  /**
+   * Calculate both Team Leaderboard & Kill Scoreboard
+   * @param allTeamScoreboards
+   */
+  private calculateLeaderboards(
+    allTeamScoreboards: TeamScoreboards[]
+  ): { killboard: KillboardEntry[]; leaderboard: LeaderboardEntry[] } {
+    let killboard: KillboardEntry[] = [];
     let leaderboard: LeaderboardEntry[] = [];
-    everyTeamScoreboard.forEach((teamScoreboard) => {
-      let totalKillsAcrossAllGames = 0;
-      let totalPointsAcrossAllGames = 0;
-      teamScoreboard.scoreboards.forEach((game) => {
-        totalKillsAcrossAllGames += game.metadata.totalKills;
-        totalPointsAcrossAllGames += game.metadata.placementPoints + game.metadata.killPoints;
+    for (let team of allTeamScoreboards) {
+      let totalTeamKills = 0;
+      let totalTeamPoints = 0;
+
+      for (let scoreboard of team.scoreboards) {
+        // Sum total kills & points each games for a team
+        totalTeamKills += scoreboard.matchMetadata.totalKills;
+        totalTeamPoints += scoreboard.matchMetadata.totalPoints;
+
+        scoreboard.players.forEach((player) => {
+          let killboardPlayerIndex = killboard.findIndex((entry) => entry.name === player.name);
+          // Update player's kill record
+          if (killboardPlayerIndex < 0) {
+            killboard.push({ name: player.name, kills: player.kills, team: team.captain.teamName });
+          } else {
+            killboard[killboardPlayerIndex].kills += player.kills;
+          }
+        });
+      }
+      leaderboard.push({
+        team: team.captain.teamName,
+        totalKills: totalTeamKills,
+        points: totalTeamPoints,
+        gamesPlayed: team.scoreboards.length,
+      });
+    }
+    killboard = killboard.sort((a, b) => (a.kills - b.kills) * -1);
+    leaderboard = leaderboard.sort((a, b) => (a.points - b.points) * -1);
+    return { killboard, leaderboard };
+  }
+
+  /*******
+   * Helper Functions
+   *******/
+
+  /**
+   * Takes any player's match and produces the game's metadata. Metadata will be the same for all player matches in the same squad.
+   * So any player's match will do.
+   * @param match
+   */
+
+  private generateDefaultUpdates() {
+    let teamScoreboards: TeamScoreboards[] = [];
+    let leaderboard: LeaderboardEntry[] = [];
+
+    for (let captain of this.config.captains) {
+      teamScoreboards.push({
+        captain,
+        scoreboards: [],
       });
 
       leaderboard.push({
-        team: teamScoreboard.captain.teamName,
-        totalKills: totalKillsAcrossAllGames,
-        points: totalPointsAcrossAllGames,
-        gamesPlayed: teamScoreboard.scoreboards.length,
+        team: captain.teamName,
+        totalKills: 0,
+        gamesPlayed: 0,
+        points: 0,
       });
-    });
-    leaderboard = leaderboard.sort((a, b) => (a.points - b.points) * -1);
-    this.leaderboardCache = leaderboard;
-    console.log('done');
-    return leaderboard;
-  }
-
-  private async getAllTeamScoreboards(captain: Captain): Promise<TeamScoreboard> {
-    return new Promise(async (done) => {
-      let matches: Match[] = await getMatches(captain);
-      console.log('Fetching data for Captain', captain.id);
-      const teamscoreboard = await getTeamboard(captain, matches);
-      this.addToScoreboardCache(teamscoreboard);
-      // Broadcast update as soon as we get it
-      this.broadcastData(
-        JSON.stringify({
-          type: 'teamScoreboardUpdate',
-          teamscoreboard,
-        })
-      );
-      done(teamscoreboard);
-    });
-  }
-
-  private broadcastData(data: string) {
-    this.wss.getWss().clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(data);
-      }
-    });
-  }
-
-  private addToScoreboardCache(teamScoreboard: TeamScoreboard) {
-    if (this.scoreboardsCache.length > config.captains.length * config.numberOfGames) {
-      this.scoreboardsCache = [];
     }
-    const index: number = this.scoreboardsCache.findIndex((ts) => ts.captain.id === teamScoreboard.captain.id);
-    if (index !== -1) {
-      this.scoreboardsCache[index] = teamScoreboard;
-      return;
-    }
-    this.scoreboardsCache.push(teamScoreboard);
+
+    this.teamScoreboardUpdates$.next(teamScoreboards);
+    this.leaderboardUpdates$.next(leaderboard);
+  }
+
+  private extractMatchMetadata(match: Match): MatchScoreboard {
+    return {
+      matchMetadata: {
+        matchId: match.matchID,
+        timestamp: new Date(match.utcStartSeconds * 1000),
+        placement: match.playerStats.teamPlacement,
+        placementDisplay: this.getPlacementOrdinalNum(match.playerStats.teamPlacement),
+        placementPoints: this.applyPlacementBonus(match.playerStats.teamPlacement),
+        duration: {
+          value: match.duration,
+          displayValue: '',
+        },
+      },
+    };
+  }
+
+  private applyKillCountBonus = (kills: number) => {
+    if (kills <= 5) return kills;
+    if (kills <= 10) return (kills - 5) * 2 + 5;
+    if (kills <= 15) return (kills - 10) * 3 + 15;
+    if (kills > 15) return (kills - 15) * 4 + 30;
+  };
+
+  private applyPlacementBonus = (placement: number) => {
+    if (placement > 30) return 0;
+    let placementScale = Array.from({ length: 30 }, (_, i) => i + 1).reverse();
+    let baseScore = placementScale[placement - 1];
+    if (placement == 1) baseScore += 15;
+    if (placement == 2) baseScore += 12;
+    if (placement == 3) baseScore += 9;
+    if (placement == 4) baseScore += 6;
+    if (placement == 5) baseScore += 3;
+    return baseScore;
+  };
+
+  /**
+   * Adds placement to ordinal (1st, 2nd, 3rd etc.)
+   * @param n
+   */
+  private getPlacementOrdinalNum(n: number) {
+    return n + (n > 0 ? ['th', 'st', 'nd', 'rd'][(n > 3 && n < 21) || n % 10 > 3 ? 0 : n % 10] : '');
   }
 }

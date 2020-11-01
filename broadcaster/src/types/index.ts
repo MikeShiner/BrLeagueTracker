@@ -1,17 +1,40 @@
+export interface KillboardEntry {
+  name: string;
+  kills: number;
+  team: string;
+}
+
+export interface Captain {
+  platform: string;
+  id: string;
+  teamName: string;
+}
+
 export interface LeaderboardEntry {
   team: string;
   totalKills: number;
   points: number;
   gamesPlayed: number;
 }
-export interface TeamScoreboard {
+
+export interface TeamScoreboards {
   captain: Captain;
-  scoreboards: GameScoreboard[];
+  scoreboards: MatchScoreboard[];
 }
 
-export interface GameScoreboard {
-  metadata: GameScoreboardMeta;
-  players: PlayerScore[];
+export interface MatchScoreboard {
+  matchMetadata: {
+    matchId: string;
+    timestamp: Date;
+    placement: number;
+    duration: { value: number; displayValue: string };
+    placementDisplay: string;
+    totalKills?: number;
+    killPoints?: number;
+    placementPoints: number;
+    totalPoints?: number;
+  };
+  players?: PlayerScore[];
 }
 
 export interface PlayerScore {
@@ -24,146 +47,99 @@ export interface PlayerScore {
   revives: number;
 }
 
-export interface GameScoreboardMeta {
-  timestamp: Date;
-  placement: number;
-  duration: { value: number; displayValue: string };
-  placementDisplay: string;
-  totalKills: number;
-  killPoints: number;
-  placementPoints: number;
-}
-
-export interface Captain {
-  platform: string;
-  id: string;
-  teamName: string;
-}
-
-export interface FullMatch {
-  data: Match;
-}
-export interface ScoreboardMetadata {
-  matches: Match[];
-}
-
 export interface Match {
-  attributes: MatchAttributes;
-  metadata: MatchMetadata;
-  segments: Segment[];
-}
-
-export interface MatchAttributes {
-  id: string;
-  mapId: MapID;
-  modeId: ModeID;
-}
-
-export interface MatchStats {
-  attributes: MatchAttributes;
-  metadata: MatchMetadata;
-  segments: Segment[];
-}
-
-export enum MapID {
-  MpDon3 = 'mp_don3',
-}
-
-export enum ModeID {
-  BrBrquads = 'br_brquads',
-  BrBrtrios = 'br_brtrios',
-}
-
-export interface MatchMetadata {
-  duration: Duration;
-  timestamp: Date;
+  utcStartSeconds: number;
+  utcEndSeconds: number;
+  map: string;
+  mode: string;
+  matchID: string;
+  duration: number;
+  playlistName: null;
+  version: number;
+  gameType: string;
   playerCount: number;
+  playerStats: { [key: string]: number };
+  player: Player;
   teamCount: number;
-  mapName: MapName;
-  mapImageUrl: string;
-  modeName: ModeName;
+  rankedTeams: null;
+  draw: boolean;
+  privateMatch: boolean;
 }
 
-export interface Duration {
-  value: number;
-  displayValue: string;
-  displayType: DisplayType;
-}
-
-export enum DisplayType {
-  Number = 'Number',
-  NumberOrdinal = 'NumberOrdinal',
-  NumberPercentage = 'NumberPercentage',
-  NumberPrecision2 = 'NumberPrecision2',
-  TimeMilliseconds = 'TimeMilliseconds',
-  TimeSeconds = 'TimeSeconds',
-}
-
-export enum MapName {
-  Verdansk = 'Verdansk',
-}
-
-export enum ModeName {
-  BRQuads = 'BR Quads',
-  BRTrios = 'BR Trios',
-}
-
-export interface Segment {
-  type: Type;
-  attributes: SegmentAttributes;
-  metadata: SegmentMetadata;
-  expiryDate: Date;
-  stats: { [key: string]: Stat };
-}
-
-export interface SegmentAttributes {
-  platformUserIdentifier: string;
-  platformSlug: null;
+export interface Player {
   team: string;
+  rank: number;
+  awards: Awards;
+  username: string;
+  uno: string;
+  clantag: string;
+  brMissionStats: BrMissionStats;
+  loadout: Loadout[];
 }
 
-export interface SegmentMetadata {
-  platformUserHandle: PlatformUserHandle;
-  clanTag: ClanTag;
-  placement: { value: number; displayValue: string };
+export interface Awards {}
+
+export interface BrMissionStats {
+  missionsComplete: number;
+  totalMissionXpEarned: number;
+  totalMissionWeaponXpEarned: number;
+  missionStatsByType: Awards;
 }
 
-export enum ClanTag {
-  Vdfc = 'VDFC',
+export interface Loadout {
+  primaryWeapon: AryWeapon;
+  secondaryWeapon: AryWeapon;
+  perks: Perk[];
+  extraPerks: Perk[];
+  killstreaks: Killstreak[];
+  tactical: Lethal;
+  lethal: Lethal;
 }
 
-export enum PlatformUserHandle {
-  Warscyther = 'Warscyther',
+export interface Perk {
+  name: ExtraPerkName;
+  label: null;
+  image: null;
+  imageMainUi: null;
+  imageProgression: null;
 }
 
-export interface Stat {
-  rank: null;
-  percentile: null;
-  displayName: string;
-  displayCategory: DisplayCategory | null;
-  category: Category | null;
-  metadata: StatMetadata;
-  value: number;
-  displayValue: string;
-  displayType: DisplayType;
+export enum ExtraPerkName {
+  Null = 'null',
+  SpecialtyNull = 'specialty_null',
 }
 
-export enum Category {
-  BattleRoyale = 'battleRoyale',
-  General = 'general',
-  Objective = 'objective',
-  XP = 'xp',
+export interface Killstreak {
+  name: KillstreakName;
+  label: null;
 }
 
-export enum DisplayCategory {
-  BattleRoyale = 'Battle Royale',
-  General = 'General',
-  Objective = 'Objective',
-  XP = 'XP',
+export enum KillstreakName {
+  None = 'none',
+  Reflex = 'reflex',
+  Silencer = 'silencer',
 }
 
-export interface StatMetadata {}
+export interface Lethal {
+  name: string;
+  label: null;
+  image: null;
+  imageLarge: null;
+  progressionImage: null;
+}
 
-export enum Type {
-  Overview = 'overview',
+export interface AryWeapon {
+  name: string;
+  label: null;
+  imageLoot: null;
+  imageIcon: null;
+  variant: string;
+  attachments: Attachment[];
+}
+
+export interface Attachment {
+  name: KillstreakName;
+  label: null;
+  image: null;
+  category: null;
 }

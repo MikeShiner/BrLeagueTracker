@@ -19,14 +19,12 @@
                 label="Game {{ team.scoreboards.length - i }}"
               >
                 <div class="table-responsive">
-                  <div class="metadata d-flex">
+                  <div class="matchMetadata d-flex">
                     <h4>
-                      Placement: {{ scoreboard.metadata.placementDisplay }}
+                      Placement: {{ scoreboard.matchMetadata.placementDisplay }}
                     </h4>
                     <h4 class="duration flex-grow-1 text-right">
-                      {{
-                        scoreboard.metadata.timestamp * 1000 | date: "h:mm a"
-                      }}
+                      {{ scoreboard.matchMetadata.timestamp | date: "h:mm a" }}
                     </h4>
                   </div>
 
@@ -68,6 +66,9 @@
                       </ng-container>
                     </tbody>
                   </table>
+                  <h4 class="text-center">
+                    Match Points: {{ scoreboard.matchMetadata.totalPoints }}
+                  </h4>
                 </div>
               </mat-tab>
             </mat-tab-group>

@@ -9,13 +9,21 @@ import WebSocket from 'ws';
 export class Config {
   startTime: Date;
   playlistThisWeek: string = "BR Trio's";
+  weekNumber: number;
   numberOfGames: number = 5;
   refreshTimeSeconds: number = 120;
   captains: Captain[] = [];
   blacklistMatches: string[];
 
-  constructor(captains: Captain[], playlistThisWeek: string, startTime?: string, blacklistMatches?: string[]) {
+  constructor(
+    captains: Captain[],
+    playlistThisWeek: string,
+    weekNumber: number,
+    startTime?: string,
+    blacklistMatches?: string[]
+  ) {
     this.startTime = startTime ? new Date(startTime) : undefined;
+    this.weekNumber = weekNumber;
     this.blacklistMatches = blacklistMatches;
     this.captains = captains;
     this.playlistThisWeek = playlistThisWeek;
@@ -34,8 +42,6 @@ class Server {
   app;
   wss;
   constructor(port: string) {
-    this.config = new Config([{ platform: 'atvi', id: 'zackody', teamName: 'PBW' }], 'BR Trios');
-
     this.app = express();
     this.app.use(express.json());
     this.wss = expressWs(this.app);
@@ -57,8 +63,12 @@ class Server {
   }
 
   async startRunner() {
-    // clean up
-    if (this.runnerInterval) clearInterval(this.runnerInterval);
+    if (this.runnerInterval) {
+      clearInterval(this.runnerInterval);
+      // Wait 10 seconds for previous loop to finish after clearing interval
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+    }
+
     if (this.teamScoreboardSub) this.teamScoreboardSub.unsubscribe();
     if (this.killboardSub) this.killboardSub.unsubscribe();
     if (this.leaderboardSub) this.leaderboardSub.unsubscribe();
@@ -160,13 +170,13 @@ class Server {
     this.config = new Config(
       newConfig.captains,
       newConfig.playlistThisWeek,
+      newConfig.weekNumber,
       newConfig.startTime,
       newConfig.blacklistMatches
     );
 
     this.emitConfigUpdate(this.config);
 
-    // TODO: Push new config to clients
     this.startRunner();
     res.sendStatus(200);
   }

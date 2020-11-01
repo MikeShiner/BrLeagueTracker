@@ -39,6 +39,7 @@ export class Runner {
     this.teamScoreboardUpdates$.next(teamScoreboardLocalCache);
     this.killboardUpdates$.next(killboard);
     this.leaderboardUpdates$.next(leaderboard);
+    console.log('Runner cycle complete');
   }
 
   async login() {

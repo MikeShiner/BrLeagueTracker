@@ -3,6 +3,7 @@ export interface KillboardEntry {
   kills: number;
   team: string;
   pos?: number;
+  damage: number;
 }
 
 export interface Captain {

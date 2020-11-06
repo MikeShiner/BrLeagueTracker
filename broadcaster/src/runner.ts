@@ -148,9 +148,15 @@ export class Runner {
           let killboardPlayerIndex = killboard.findIndex((entry) => entry.name === player.name);
           // Update player's kill record
           if (killboardPlayerIndex < 0) {
-            killboard.push({ name: player.name, kills: player.kills, team: team.captain.teamName });
+            killboard.push({
+              name: player.name,
+              kills: player.kills,
+              team: team.captain.teamName,
+              damage: player.damage,
+            });
           } else {
             killboard[killboardPlayerIndex].kills += player.kills;
+            killboard[killboardPlayerIndex].damage += player.damage ?? 0;
           }
         });
       }
@@ -163,7 +169,12 @@ export class Runner {
     }
     // Sorting & work out player's position
     leaderboard = leaderboard.sort((a, b) => (a.points - b.points) * -1);
-    killboard = killboard.sort((a, b) => (a.kills - b.kills) * -1);
+    killboard = killboard.sort((a, b) => {
+      // If kills are the same, sort on highest damage, otherwise sort on kills
+      if (a.kills - b.kills === 0) return (a.damage - b.damage) * -1;
+      return (a.kills - b.kills) * -1;
+    });
+
     let pos = 1;
     let killsToBeat = 0;
     killboard.forEach((e) => {

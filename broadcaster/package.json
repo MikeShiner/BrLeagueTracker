@@ -9,9 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/aws-sdk": "^2.7.0",
     "@types/axios": "^0.14.0",
     "@types/express-ws": "^3.0.0",
     "@types/ws": "^7.2.7",
+    "aws-sdk": "^2.786.0",
     "axios": "^0.20.0",
     "body-parser": "^1.19.0",
     "call-of-duty-api": "^1.2.16",

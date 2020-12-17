@@ -14,7 +14,10 @@ export class Runner {
   leaderboardUpdates$: BehaviorSubject<LeaderboardEntry[]> = new BehaviorSubject<LeaderboardEntry[]>([]);
   killboardUpdates$: BehaviorSubject<KillboardEntry[]> = new BehaviorSubject<KillboardEntry[]>([]);
 
-  private API = require('call-of-duty-api')({ platform: 'battle' });
+  private API = require('call-of-duty-api')({
+    platform: 'battle',
+    ratelimit: { maxRequests: 1, perMilliseconds: 2000 },
+  });
   private isFirstRun = true;
   constructor(private config: Config, private username: string, private password: string) {}
 
@@ -265,7 +268,6 @@ export class Runner {
   }
 
   async checkCaptainExists(captainId: string) {
-    let data = await this.API.MWcombatwz(captainId, 'acti');
-    data;
+    await this.API.MWcombatwz(captainId, 'acti');
   }
 }

@@ -1,6 +1,6 @@
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { NgModule } from "@angular/core";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
 import { ToastrModule } from "ngx-toastr";
@@ -17,7 +17,8 @@ import { ScoreboardComponent } from "./pages/scoreboard/scoreboard.component";
 import { TrackerService } from "./services/tracker.service";
 
 import { MatTabsModule } from "@angular/material/tabs";
-import { RulesComponent } from './pages/rules/rules.component';
+import { RulesComponent } from "./pages/rules/rules.component";
+import { RegisterComponent } from "./pages/register/register.component";
 @NgModule({
   imports: [
     BrowserAnimationsModule,
@@ -29,6 +30,7 @@ import { RulesComponent } from './pages/rules/rules.component';
     AppRoutingModule,
     ToastrModule.forRoot(),
     MatTabsModule,
+    ReactiveFormsModule,
   ],
   declarations: [
     AppComponent,
@@ -36,6 +38,7 @@ import { RulesComponent } from './pages/rules/rules.component';
     LeaderboardComponent,
     ScoreboardComponent,
     RulesComponent,
+    RegisterComponent,
   ],
   providers: [TrackerService],
   bootstrap: [AppComponent],

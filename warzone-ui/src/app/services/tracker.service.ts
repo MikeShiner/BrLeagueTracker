@@ -1,8 +1,7 @@
-import { ThrowStmt } from "@angular/compiler";
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { environment } from "src/environments/environment";
-import { ScoreboardComponent } from "../pages/scoreboard/scoreboard.component";
 import { Config } from "./models/config";
 import {
   KillboardEntry,
@@ -29,8 +28,8 @@ export class TrackerService {
   }
 
   private ws: WebSocket;
-  constructor() {
-    this.ws = new WebSocket(`ws://${environment.api}`);
+  constructor(private _http: HttpClient) {
+    this.ws = new WebSocket(`${environment.websocketEndpoint}`);
     this.ws.onmessage = ({ data }) => {
       let msg = JSON.parse(data);
       console.log(msg);
@@ -48,5 +47,22 @@ export class TrackerService {
         this.killboard$.next(msg.killboard);
       }
     };
+  }
+
+  submitCaptainRegistration(
+    activisionId: string,
+    teamName: string,
+    mobile: string
+  ) {
+    return this._http.post(`${environment.api}/captain/register`, {
+      week: this.config.weekNumber,
+      game: this.config.gameNumber,
+      timestamp: new Date().toISOString(),
+      teamName,
+      captain: {
+        activisionId,
+        mobile,
+      },
+    });
   }
 }

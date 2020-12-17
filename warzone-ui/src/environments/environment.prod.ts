@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  api: "brleagues.com/updates",
+  websocketEndpoint: "ws://brleagues.com/updates",
+  api: "http://brleagues.com",
 };

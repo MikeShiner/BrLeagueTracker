@@ -6,11 +6,12 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import WebSocket from 'ws';
 import { Database } from './database';
 import { CaptainCollection } from './types/captain.collection';
-
+import cors from 'cors';
 export class Config {
   startTime: Date;
   playlistThisWeek: string = "BR Trio's";
   weekNumber: number;
+  gameNumber: number;
   numberOfGames: number = 5;
   refreshTimeSeconds: number = 120;
   captains: Captain[] = [];
@@ -47,6 +48,7 @@ class Server {
     this.app = express();
     this.database = new Database();
     this.app.use(express.json());
+    this.app.use(cors());
     this.wss = expressWs(this.app);
     this.setupInitialValuesWsRoute();
 
@@ -54,7 +56,7 @@ class Server {
 
     // Configuration endpoint
     this.app.post('/config', this.newConfigRequest.bind(this));
-    this.app.post('/captains/register', this.registerCaptain.bind(this));
+    this.app.post('/captain/register', this.registerCaptain.bind(this));
 
     this.app.get('/historical/:week', async (req: Request, res: Response) => {
       let week = parseInt(req.params.week);
@@ -90,7 +92,7 @@ class Server {
 
     await this.runner.login();
     await this.runner.runnerLoop();
-    this.runnerInterval = setInterval(async () => await this.runner.runnerLoop(), 1 * 120000); // 2 minutes
+    this.runnerInterval = setInterval(async () => await this.runner.runnerLoop(), 1 * 240000); // 4 minutes
   }
 
   private newConfigRequest(req: Request, res: Response) {
@@ -121,8 +123,9 @@ class Server {
       res.sendStatus(200);
     } catch (err) {
       let message = err;
+      message = 'Invalid Activision ID, please try again';
       if (!!err.message) {
-        message = 'Invalid Activision ID, please try again';
+        message = 'Error submitting Captain. Please ask support.';
         console.error('Captain Registration Error: ', err.message);
         console.error(request);
       }

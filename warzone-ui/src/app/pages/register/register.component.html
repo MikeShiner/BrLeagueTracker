@@ -8,8 +8,10 @@
         </div>
         <div class="card-body center-piece">
           <h4 class="text-center">
-            Registration Closes on Thursday at 12pm Noon
+            Next Drop:
+            {{ (trackerService.config$ | async)?.startTime | ordinalDate }}
           </h4>
+          <h4 class="text-center"></h4>
         </div>
       </div>
       <div class="card">

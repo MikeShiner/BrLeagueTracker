@@ -75,6 +75,7 @@
     "@ng-bootstrap/ng-bootstrap": "6.0.0",
     "chart.js": "2.8.0",
     "core-js": "3.6.4",
+    "moment": "^2.29.1",
     "ngx-toastr": "10.0.4",
     "rxjs": "6.5.2",
     "tslib": "1.10.0",

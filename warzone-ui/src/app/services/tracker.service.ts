@@ -24,8 +24,9 @@ export class TrackerService {
   killboard$: BehaviorSubject<KillboardEntry[]> = new BehaviorSubject([]);
 
   private _config: Config;
+  config$: BehaviorSubject<Config> = new BehaviorSubject(null);
   get config() {
-    return this._config;
+    return this.config$.value;
   }
 
   private ws: WebSocket;
@@ -36,6 +37,7 @@ export class TrackerService {
       console.log(msg);
       if (msg.type === "config") {
         this._config = msg.config;
+        this.config$.next(msg.config);
       } else if (msg.type === "leaderboard") {
         console.log(msg);
         this._leaderboard = msg.leaderboard;

@@ -19,6 +19,7 @@ import { TrackerService } from "./services/tracker.service";
 import { MatTabsModule } from "@angular/material/tabs";
 import { RulesComponent } from "./pages/rules/rules.component";
 import { RegisterComponent } from "./pages/register/register.component";
+import { OrdinalDatePipe } from "./pipes/ordinal-date.pipe";
 @NgModule({
   imports: [
     BrowserAnimationsModule,
@@ -39,6 +40,7 @@ import { RegisterComponent } from "./pages/register/register.component";
     ScoreboardComponent,
     RulesComponent,
     RegisterComponent,
+    OrdinalDatePipe,
   ],
   providers: [TrackerService],
   bootstrap: [AppComponent],

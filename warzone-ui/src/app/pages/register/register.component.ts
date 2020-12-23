@@ -25,7 +25,9 @@ export class RegisterComponent implements OnInit {
 
   registeredCaptains: RegisteredCaptain[];
 
-  constructor(private trackerService: TrackerService) {}
+  constructor(private trackerService: TrackerService) {
+    this.trackerService.config$.subscribe((config) => console.log(config));
+  }
 
   ngOnInit(): void {
     this.captainForm.valueChanges.subscribe((_) => {
@@ -66,6 +68,7 @@ export class RegisterComponent implements OnInit {
               this.submitButtonText = "Let's Go!";
               this.successMessageShow = true;
               this.captainForm.reset();
+              this.getRegisteredCaptains();
             }
           },
           (error) => {

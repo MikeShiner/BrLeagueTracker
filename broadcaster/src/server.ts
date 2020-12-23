@@ -52,22 +52,36 @@ class Server {
   constructor(port: string) {
     this.app = express();
     this.database = new Database();
+
     this.app.use(express.json());
     this.app.use(cors());
     this.wss = expressWs(this.app);
     this.setupInitialValuesWsRoute();
 
+    if (process.env.devMode) {
+      this.database.createTableIfNotExists();
+      this.newConfigRequest(
+        {
+          body: {
+            startTime: '2021-01-01T20:00Z',
+            playlistThisWeek: "BR Trio's",
+            numberOfGames: 5,
+            weekNumber: 11,
+            refreshTimeSeconds: 120,
+            captains: [],
+            blacklistMatches: [],
+          },
+        } as any,
+        { sendStatus: (x) => {} } as any
+      );
+    }
+
     this.app.get('*.*', express.static(__dirname + '/ui', { maxAge: '1y' }));
 
     // Configuration endpoint
     this.app.post('/config', this.newConfigRequest.bind(this));
+    this.app.get('/captain', this.getAllCaptains.bind(this));
     this.app.post('/captain/register', this.registerCaptain.bind(this));
-
-    this.app.get('/historical/:week', async (req: Request, res: Response) => {
-      let week = parseInt(req.params.week);
-      if (isNaN(week)) res.send(400);
-      res.send(await this.database.getHistoricTournament(week));
-    });
 
     // Server angular
     this.app.use('/', function (req: Request, res: Response) {
@@ -102,32 +116,27 @@ class Server {
     this.runnerInterval = setInterval(async () => await this.runner.runnerLoop(), 1 * 240000); // 4 minutes
   }
 
-  private newConfigRequest(req: Request, res: Response) {
-    console.log('New config received..');
-    let newConfig = req.body;
-    this.config = new Config(
-      newConfig.captains,
-      newConfig.playlistThisWeek,
-      newConfig.weekNumber,
-      newConfig.startTime,
-      newConfig.blacklistMatches
-    );
-
-    this.emitConfigUpdate(this.config);
-
-    this.startRunner();
-    res.sendStatus(200);
-  }
-
   private async registerCaptain(req: Request, res: Response) {
     console.log('New captain registration');
+    if (!this.config) {
+      console.log('No config found!');
+      res.send(500);
+      return;
+    }
+
     let request: CaptainCollection = req.body;
+    request.startTime = this.config.startTime.toISOString();
     // Check if body is correct\
     // Check if captain exists!
     try {
-      await this.runner.checkCaptainExists(request.captain.activisionId);
-      await this.database.InsertNewNewRegisteredCaptain(request);
-      res.sendStatus(200);
+      await this.runner.checkCaptainExists(request.captainId);
+    } catch (err) {
+      res.status(400).send({ message: "Activision ID does not exist. Please sure format is '<id>#<6 digit number>'" });
+      return;
+    }
+    try {
+      await this.database.InsertNewRegisteredCaptain(request);
+      res.status(200).send({ message: 'OK' });
     } catch (err) {
       let message = err;
       message = 'Invalid Activision ID, please try again';
@@ -138,6 +147,11 @@ class Server {
       }
       res.status(400).send({ message, ex: err });
     }
+  }
+
+  private async getAllCaptains(req: Request, res: Response) {
+    const allCaptains = await this.database.getRegisteredCaptains(this.config.startTime.toISOString());
+    res.send(allCaptains);
   }
 
   private setupInitialValuesWsRoute() {

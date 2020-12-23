@@ -1,10 +1,7 @@
 export interface CaptainCollection {
-  week: number;
-  game: number;
+  startTime: string;
   timestamp: string;
   teamName: string;
-  captain: {
-    activisionId: string;
-    mobile: number;
-  };
+  captainId: string;
+  mobile: number;
 }

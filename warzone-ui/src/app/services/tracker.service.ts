@@ -50,19 +50,15 @@ export class TrackerService {
   }
 
   submitCaptainRegistration(
-    activisionId: string,
+    captainId: string,
     teamName: string,
     mobile: string
   ) {
     return this._http.post(`${environment.api}/captain/register`, {
-      week: this.config.weekNumber,
-      game: this.config.gameNumber,
       timestamp: new Date().toISOString(),
       teamName,
-      captain: {
-        activisionId,
-        mobile,
-      },
+      captainId,
+      mobile,
     });
   }
 }

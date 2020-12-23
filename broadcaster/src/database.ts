@@ -6,33 +6,22 @@ export class Database {
   private readonly Historical_Table_Name = 'BrLeagues-Warzone-Historical';
   private readonly Captains_Table_Name = 'BrLeagues-Warzone-Captains';
   constructor() {
-    let localDev = {
-      region: 'local',
-      endpoint: 'http://localhost:8000',
-    };
     AWS.config.update({
-      region: 'eu-west-2',
+      region: 'eu-west-1',
     });
+
+    if (process.env.devMode) {
+      let localDev = {
+        region: 'local',
+        endpoint: 'http://localhost:8000',
+      };
+      AWS.config.update(localDev);
+    }
     this.dynamodb = new DynamoDB();
     this.docClient = new AWS.DynamoDB.DocumentClient();
   }
 
-  async getHistoricTournament(week: number) {
-    const queryParams: DynamoDB.Types.DocumentClient.QueryInput = {
-      TableName: this.Historical_Table_Name,
-      KeyConditionExpression: '#week = :week',
-      ExpressionAttributeNames: {
-        '#week': 'week',
-      },
-      ExpressionAttributeValues: {
-        ':week': week,
-      },
-    };
-    const res = await this.docClient.query(queryParams).promise();
-    return res.Items[0];
-  }
-
-  async InsertNewNewRegisteredCaptain(captain: CaptainCollection) {
+  async InsertNewRegisteredCaptain(captain: CaptainCollection) {
     // Insert captain into table BrLeagues-Warzone-Captains
     let params: DynamoDB.Types.DocumentClient.PutItemInput = {
       TableName: this.Captains_Table_Name,
@@ -41,56 +30,58 @@ export class Database {
     await this.docClient.put(params).promise();
   }
 
-  // async createTableIfNotExists() {
-  //   // this.dynamodb.
+  async getRegisteredCaptains(startTime: string) {
+    let params: DynamoDB.Types.DocumentClient.QueryInput = {
+      TableName: this.Captains_Table_Name,
+      KeyConditionExpression: '#startTime = :startTime',
+      ExpressionAttributeNames: {
+        '#startTime': 'startTime',
+      },
+      ExpressionAttributeValues: {
+        ':startTime': startTime,
+      },
+    };
+    return (await this.docClient.query(params).promise()).Items;
+  }
 
-  //   var params: DynamoDB.Types.CreateTableInput = {
-  //     TableName: 'BrLeagues-Warzone',
-  //     KeySchema: [
-  //       { AttributeName: 'week', KeyType: 'HASH' }, //Partition key
-  //     ],
-  //     AttributeDefinitions: [{ AttributeName: 'week', AttributeType: 'N' }],
-  //     ProvisionedThroughput: {
-  //       ReadCapacityUnits: 5,
-  //       WriteCapacityUnits: 5,
-  //     },
-  //   };
+  async createTableIfNotExists() {
+    // this.dynamodb.
 
-  //   await this.dynamodb.deleteTable(
-  //     {
-  //       TableName: this.tableName,
-  //     },
-  //     (err, data) => {
-  //       console.log(err);
-  //     }
-  //   );
+    var params: DynamoDB.Types.CreateTableInput = {
+      TableName: this.Captains_Table_Name,
+      KeySchema: [
+        { AttributeName: 'startTime', KeyType: 'HASH' }, //Partition key
+        { AttributeName: 'captainId', KeyType: 'RANGE' }, //Sort key
+      ],
+      AttributeDefinitions: [
+        { AttributeName: 'startTime', AttributeType: 'S' },
+        { AttributeName: 'captainId', AttributeType: 'S' },
+      ],
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 1,
+        WriteCapacityUnits: 1,
+      },
+    };
 
-  //   let result = await this.dynamodb
-  //     .createTable(params)
-  //     .promise()
-  //     .catch((err) => {
-  //       if (err.message !== 'Cannot create preexisting table') {
-  //         console.error('Unable to create table. Error JSON:', JSON.stringify(err, null, 2));
-  //         throw err;
-  //       }
-  //     });
+    await this.dynamodb.deleteTable(
+      {
+        TableName: this.Captains_Table_Name,
+      },
+      (err, data) => {
+        console.log(err);
+      }
+    );
 
-  //   const docClient = new AWS.DynamoDB.DocumentClient();
+    let result = await this.dynamodb
+      .createTable(params)
+      .promise()
+      .catch((err) => {
+        if (err.message !== 'Cannot create preexisting table') {
+          console.error('Unable to create table. Error JSON:', JSON.stringify(err, null, 2));
+          throw err;
+        }
+      });
 
-  //   let params2 = {
-  //     TableName: 'BrLeagues-Warzone',
-  //     Item: week4,
-  //   };
-
-  //   let result2 = await docClient
-  //     .put(params2)
-  //     .promise()
-  //     .catch((err) => {
-  //       throw err;
-  //     });
-
-  //   console.log(result2);
-  // }
+    console.log(result);
+  }
 }
-
-new Database();

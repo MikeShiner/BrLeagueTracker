@@ -23,7 +23,7 @@
                     >Activision ID <span class="text-danger">*</span></label
                   >
                   <input
-                    formControlName="activisionId"
+                    formControlName="captainId"
                     class="form-control"
                     placeholder="MyWarzoneHandle#12345678"
                     type="text"
@@ -31,8 +31,8 @@
                   <label
                     class="text-danger"
                     *ngIf="
-                      captainForm.get('activisionId').errors?.required &&
-                      captainForm.get('activisionId').touched
+                      captainForm.get('captainId').errors?.required &&
+                      captainForm.get('captainId').touched
                     "
                   >
                     Activision ID is required.
@@ -104,6 +104,12 @@
               </button>
             </div>
           </form>
+          <div class="text-center text-success" *ngIf="successMessageShow">
+            <span>Team Registered Successfully!</span>
+          </div>
+          <div class="text-center text-danger" *ngIf="failureMessageShow">
+            <span>{{ failureMessage }}</span>
+          </div>
         </div>
       </div>
       <div class="card card-plain">

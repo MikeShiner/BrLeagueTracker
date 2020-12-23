@@ -269,6 +269,7 @@ export class Runner {
   }
 
   async checkCaptainExists(captainId: string) {
-    await this.API.MWcombatwz(captainId, 'acti');
+    // Will throw exception if captain does not exist
+    return await this.API.MWcombatwz(captainId, 'acti');
   }
 }

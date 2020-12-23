@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { TrackerService } from "src/app/services/tracker.service";
-import { catchError } from "rxjs/operators";
 @Component({
   selector: "app-register",
   templateUrl: "./register.component.html",
@@ -10,8 +9,12 @@ import { catchError } from "rxjs/operators";
 export class RegisterComponent implements OnInit {
   submitButtonDisable = true;
   submitButtonText = "Let's Go!";
+  successMessageShow = false;
+  failureMessageShow = false;
+  failureMessage = "";
+
   captainForm: FormGroup = new FormGroup({
-    activisionId: new FormControl("", [Validators.required]),
+    captainId: new FormControl("", [Validators.required]),
     teamName: new FormControl("", [Validators.required]),
     mobile: new FormControl("", [
       Validators.required,
@@ -28,16 +31,34 @@ export class RegisterComponent implements OnInit {
   }
 
   onFormSubmit() {
+    this.successMessageShow = false;
+    this.failureMessageShow = false;
     this.submitButtonText = "Submitting..";
     this.submitButtonDisable = true;
+
     if (this.captainForm.valid) {
       this.trackerService
         .submitCaptainRegistration(
-          this.captainForm.get("activisionId").value,
+          this.captainForm.get("captainId").value,
           this.captainForm.get("teamName").value,
           this.captainForm.get("mobile").value
         )
-        .subscribe((res) => console.log("RES", res));
+        .subscribe(
+          (res: { message: string }) => {
+            console.log(res);
+            if (res.message === "OK") {
+              this.submitButtonText = "Let's Go!";
+              this.successMessageShow = true;
+            }
+          },
+          (error) => {
+            console.log(error);
+            this.failureMessageShow = true;
+            this.failureMessage = error.error.message;
+            this.submitButtonDisable = false;
+            this.submitButtonText = "Let's Go!";
+          }
+        );
     }
   }
 }

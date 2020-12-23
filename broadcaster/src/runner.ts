@@ -71,10 +71,10 @@ export class Runner {
       // Filter by startTime
       data.matches = data.matches.filter((m: Match) => new Date(m.utcStartSeconds * 1000) > this.config.startTime);
       // Select ealiest 5 games from startTime
-      data.matches = data.matches.slice(Math.max(data.matches.length - 5, 0));
+      data.matches = data.matches.slice(Math.max(data.matches.length - this.config.numberOfGames, 0));
     } else {
       // Otherwise just select latest 5 games
-      data.matches = data.matches.slice(0, 5);
+      data.matches = data.matches.slice(0, this.config.numberOfGames);
     }
     return data.matches;
   }

@@ -19,6 +19,7 @@ export class Config {
     captains: Captain[],
     playlistThisWeek: string,
     weekNumber: number,
+    numberOfGames: number,
     startTime?: string,
     blacklistMatches?: string[]
   ) {
@@ -27,6 +28,7 @@ export class Config {
     this.blacklistMatches = blacklistMatches;
     this.captains = captains;
     this.playlistThisWeek = playlistThisWeek;
+    this.numberOfGames = numberOfGames;
   }
 }
 
@@ -171,6 +173,7 @@ class Server {
       newConfig.captains,
       newConfig.playlistThisWeek,
       newConfig.weekNumber,
+      newConfig.numberOfGames,
       newConfig.startTime,
       newConfig.blacklistMatches
     );

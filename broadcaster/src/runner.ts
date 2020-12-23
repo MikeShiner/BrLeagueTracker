@@ -21,10 +21,11 @@ export class Runner {
   private isFirstRun = true;
   constructor(private config: Config, private username: string, private password: string) {}
 
-  async runnerLoop() {
-    if (this.isFirstRun) this.generateDefaultUpdates();
-    this.isFirstRun = false;
+  setConfig(config: Config) {
+    this.config = config;
+  }
 
+  async runnerLoop() {
     console.log('Runner loop started at ', new Date());
     let teamScoreboardLocalCache = [];
     for (let captain of this.config.captains) {
@@ -74,10 +75,10 @@ export class Runner {
       // Filter by startTime
       data.matches = data.matches.filter((m: Match) => new Date(m.utcStartSeconds * 1000) > this.config.startTime);
       // Select ealiest 5 games from startTime
-      data.matches = data.matches.slice(Math.max(data.matches.length - 5, 0));
+      data.matches = data.matches.slice(Math.max(data.matches.length - this.config.numberOfGames, 0));
     } else {
       // Otherwise just select latest 5 games
-      data.matches = data.matches.slice(0, 5);
+      data.matches = data.matches.slice(0, this.config.numberOfGames);
     }
     return data.matches;
   }
@@ -202,7 +203,7 @@ export class Runner {
    * @param match
    */
 
-  private generateDefaultUpdates() {
+  public generateDefaultUpdates() {
     let teamScoreboards: TeamScoreboards[] = [];
     let leaderboard: LeaderboardEntry[] = [];
 

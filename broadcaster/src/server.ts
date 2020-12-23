@@ -21,6 +21,7 @@ export class Config {
     captains: Captain[],
     playlistThisWeek: string,
     weekNumber: number,
+    numberOfGames: number,
     startTime?: string,
     blacklistMatches?: string[]
   ) {
@@ -29,6 +30,7 @@ export class Config {
     this.blacklistMatches = blacklistMatches;
     this.captains = captains;
     this.playlistThisWeek = playlistThisWeek;
+    this.numberOfGames = numberOfGames;
   }
 }
 
@@ -36,6 +38,9 @@ class Server {
   config: Config;
   runner: Runner;
   database: Database;
+
+  // Wheter or not to login and clear the board
+  isFirstRun: boolean = true;
 
   teamScoreboardSub: Subscription;
   leaderboardSub: Subscription;
@@ -81,16 +86,18 @@ class Server {
       await new Promise((resolve) => setTimeout(resolve, 10000));
     }
 
-    if (this.teamScoreboardSub) this.teamScoreboardSub.unsubscribe();
-    if (this.killboardSub) this.killboardSub.unsubscribe();
-    if (this.leaderboardSub) this.leaderboardSub.unsubscribe();
+    if (this.isFirstRun) {
+      this.runner = new Runner(this.config, process.env.user, process.env.pass);
+      await this.runner.login();
+      this.runner.generateDefaultUpdates();
 
-    this.runner = new Runner(this.config, process.env.user, process.env.pass);
-    this.teamScoreboardSub = this.runner.teamScoreboardUpdates$.subscribe((s) => this.emitTeamScoreboardUpdate(s));
-    this.killboardSub = this.runner.killboardUpdates$.subscribe((s) => this.emitKillboardUpdate(s));
-    this.leaderboardSub = this.runner.leaderboardUpdates$.subscribe((s) => this.emitLeaderboardUpdate(s));
+      this.teamScoreboardSub = this.runner.teamScoreboardUpdates$.subscribe((s) => this.emitTeamScoreboardUpdate(s));
+      this.killboardSub = this.runner.killboardUpdates$.subscribe((s) => this.emitKillboardUpdate(s));
+      this.leaderboardSub = this.runner.leaderboardUpdates$.subscribe((s) => this.emitLeaderboardUpdate(s));
 
-    await this.runner.login();
+      this.isFirstRun = false;
+    }
+
     await this.runner.runnerLoop();
     this.runnerInterval = setInterval(async () => await this.runner.runnerLoop(), 1 * 240000); // 4 minutes
   }
@@ -212,6 +219,24 @@ class Server {
         );
       }
     });
+  }
+
+  private newConfigRequest(req: Request, res: Response) {
+    console.log('New config received..');
+    let newConfig = req.body;
+    this.config = new Config(
+      newConfig.captains,
+      newConfig.playlistThisWeek,
+      newConfig.weekNumber,
+      newConfig.numberOfGames,
+      newConfig.startTime,
+      newConfig.blacklistMatches
+    );
+
+    this.emitConfigUpdate(this.config);
+    this.startRunner();
+    this.runner.setConfig(this.config);
+    res.sendStatus(200);
   }
 }
 new Server(process.env.port);

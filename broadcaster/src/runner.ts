@@ -15,13 +15,13 @@ export class Runner {
   killboardUpdates$: BehaviorSubject<KillboardEntry[]> = new BehaviorSubject<KillboardEntry[]>([]);
 
   private API = require('call-of-duty-api')({ platform: 'battle' });
-  private isFirstRun = true;
   constructor(private config: Config, private username: string, private password: string) {}
 
-  async runnerLoop() {
-    if (this.isFirstRun) this.generateDefaultUpdates();
-    this.isFirstRun = false;
+  setConfig(config: Config) {
+    this.config = config;
+  }
 
+  async runnerLoop() {
     console.log('Runner loop started at ', new Date());
     let teamScoreboardLocalCache = [];
     for (let captain of this.config.captains) {
@@ -199,7 +199,7 @@ export class Runner {
    * @param match
    */
 
-  private generateDefaultUpdates() {
+  public generateDefaultUpdates() {
     let teamScoreboards: TeamScoreboards[] = [];
     let leaderboard: LeaderboardEntry[] = [];
 

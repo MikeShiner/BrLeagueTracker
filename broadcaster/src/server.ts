@@ -80,8 +80,8 @@ class Server {
 
     // Configuration endpoint
     this.app.post('/config', this.newConfigRequest.bind(this));
-    this.app.get('/captain', this.getAllCaptains.bind(this));
-    this.app.post('/captain/register', this.registerCaptain.bind(this));
+    this.app.get('/captains', this.getAllCaptains.bind(this));
+    this.app.post('/captains/register', this.registerCaptain.bind(this));
 
     // Server angular
     this.app.use('/', function (req: Request, res: Response) {
@@ -131,7 +131,7 @@ class Server {
     try {
       await this.runner.checkCaptainExists(request.captainId);
     } catch (err) {
-      res.status(400).send({ message: "Activision ID does not exist. Please sure format is '<id>#<6 digit number>'" });
+      res.status(400).send({ message: 'Activision ID does not exist. Please sure format is correct.' });
       return;
     }
     try {

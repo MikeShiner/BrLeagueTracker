@@ -6,6 +6,7 @@ import { Config } from "./models/config";
 import {
   KillboardEntry,
   LeaderboardEntry,
+  RegisteredCaptain,
   TeamScoreboard,
 } from "./models/server-models";
 
@@ -54,11 +55,15 @@ export class TrackerService {
     teamName: string,
     mobile: string
   ) {
-    return this._http.post(`${environment.api}/captain/register`, {
+    return this._http.post(`${environment.api}/captains/register`, {
       timestamp: new Date().toISOString(),
       teamName,
       captainId,
       mobile,
     });
+  }
+
+  getAllRegisteredCpatains() {
+    return this._http.get<RegisteredCaptain[]>(`${environment.api}/captains`);
   }
 }

@@ -1,12 +1,8 @@
-export interface CaptainRegisterRequest {
-  week: number;
-  game: number;
+export interface RegisteredCaptain {
   timestamp: string;
   teamName: string;
-  captain: {
-    activisionId: string;
-    mobile: number;
-  };
+  captainId: string;
+  mobile: number;
 }
 
 export interface KillboardEntry {

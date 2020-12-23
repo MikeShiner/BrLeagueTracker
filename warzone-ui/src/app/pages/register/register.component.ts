@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { RegisteredCaptain } from "src/app/services/models/server-models";
 import { TrackerService } from "src/app/services/tracker.service";
 @Component({
   selector: "app-register",
@@ -22,11 +23,26 @@ export class RegisterComponent implements OnInit {
     ]),
   });
 
+  registeredCaptains: RegisteredCaptain[];
+
   constructor(private trackerService: TrackerService) {}
 
   ngOnInit(): void {
     this.captainForm.valueChanges.subscribe((_) => {
       if (this.captainForm.valid) this.submitButtonDisable = false;
+    });
+
+    this.getRegisteredCaptains();
+  }
+
+  getRegisteredCaptains() {
+    this.trackerService.getAllRegisteredCpatains().subscribe((res) => {
+      this.registeredCaptains = res.map((captain) => {
+        if (captain.captainId.includes("#")) {
+          captain.captainId = captain.captainId.split("#")[0];
+        }
+        return captain;
+      });
     });
   }
 
@@ -49,6 +65,7 @@ export class RegisterComponent implements OnInit {
             if (res.message === "OK") {
               this.submitButtonText = "Let's Go!";
               this.successMessageShow = true;
+              this.captainForm.reset();
             }
           },
           (error) => {

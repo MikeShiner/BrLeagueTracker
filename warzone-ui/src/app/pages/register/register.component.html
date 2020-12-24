@@ -3,7 +3,7 @@
     <div class="col-md-12">
       <div class="card card-plain">
         <div class="card-header">
-          <h3 class="card-title">Captain Registration</h3>
+          <h3 class="card-title">Registration</h3>
           <!-- <p class="category">Updated: Wednesday 29/10/2020</p> -->
         </div>
         <div class="card-body center-piece">
@@ -11,7 +11,9 @@
             Next Drop:
             {{ (trackerService.config$ | async)?.startTime | ordinalDate }}
           </h4>
-          <h4 class="text-center"></h4>
+          <h4 class="text-center">
+            Playlist: {{ (trackerService.config$ | async)?.playlistThisWeek }}
+          </h4>
         </div>
       </div>
       <div class="card">
@@ -111,6 +113,9 @@
           </div>
           <div class="text-center text-danger" *ngIf="failureMessageShow">
             <span>{{ failureMessage }}</span>
+          </div>
+          <div class="text-center text-danger" *ngIf="registrationClosed">
+            <span>Registration Is Closed</span>
           </div>
         </div>
       </div>

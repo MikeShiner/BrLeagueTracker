@@ -2,6 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { RegisteredCaptain } from "src/app/services/models/server-models";
 import { TrackerService } from "src/app/services/tracker.service";
+import * as moment from "moment";
+import { skip } from "rxjs/operators";
 @Component({
   selector: "app-register",
   templateUrl: "./register.component.html",
@@ -12,6 +14,7 @@ export class RegisterComponent implements OnInit {
   submitButtonText = "Let's Go!";
   successMessageShow = false;
   failureMessageShow = false;
+  registrationClosed = false;
   failureMessage = "";
 
   captainForm: FormGroup = new FormGroup({
@@ -26,7 +29,19 @@ export class RegisterComponent implements OnInit {
   registeredCaptains: RegisteredCaptain[];
 
   constructor(private trackerService: TrackerService) {
-    this.trackerService.config$.subscribe((config) => console.log(config));
+    this.trackerService.config$.pipe(skip(1)).subscribe((config) => {
+      let minutesTillDrop: number = moment(config?.startTime).diff(
+        new Date(),
+        "minutes"
+      );
+      if (minutesTillDrop < 31) {
+        this.registrationClosed = true;
+        this.submitButtonDisable = true;
+      } else {
+        this.registrationClosed = false;
+        this.submitButtonDisable = false;
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -39,12 +54,17 @@ export class RegisterComponent implements OnInit {
 
   getRegisteredCaptains() {
     this.trackerService.getAllRegisteredCpatains().subscribe((res) => {
-      this.registeredCaptains = res.map((captain) => {
-        if (captain.captainId.includes("#")) {
-          captain.captainId = captain.captainId.split("#")[0];
-        }
-        return captain;
-      });
+      this.registeredCaptains = res
+        .map((captain) => {
+          if (captain.captainId.includes("#")) {
+            captain.captainId = captain.captainId.split("#")[0];
+          }
+          return captain;
+        })
+        .sort(
+          (a, b) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
     });
   }
 

@@ -32,6 +32,10 @@ export class Config {
     this.playlistThisWeek = playlistThisWeek;
     this.numberOfGames = numberOfGames;
   }
+
+  addCaptain(captainId: string, teamName: string) {
+    this.captains.push({ id: captainId, teamName });
+  }
 }
 
 class Server {
@@ -131,15 +135,17 @@ class Server {
     try {
       await this.runner.checkCaptainExists(request.captainId);
     } catch (err) {
-      res.status(400).send({ message: 'Activision ID does not exist. Please sure format is correct.' });
+      res.status(400).send({ message: 'Activision ID does not exist. Please ensure format is correct.' });
       return;
     }
     try {
       await this.database.InsertNewRegisteredCaptain(request);
+      this.config.addCaptain(request.captainId, request.teamName);
+      this.refreshConfig();
+
       res.status(200).send({ message: 'OK' });
     } catch (err) {
       let message = err;
-      message = 'Invalid Activision ID, please try again';
       if (!!err.message) {
         message = 'Error submitting Captain. Please ask support.';
         console.error('Captain Registration Error: ', err.message);
@@ -246,11 +252,15 @@ class Server {
       newConfig.startTime,
       newConfig.blacklistMatches
     );
+    this.refreshConfig();
+    res.sendStatus(200);
+  }
 
+  private refreshConfig() {
+    console.log('Refreshing Config', this.config);
     this.emitConfigUpdate(this.config);
     this.startRunner();
     this.runner.setConfig(this.config);
-    res.sendStatus(200);
   }
 }
 new Server(process.env.port);

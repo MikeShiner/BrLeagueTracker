@@ -270,6 +270,8 @@ export class Runner {
 
   async checkCaptainExists(captainId: string) {
     // Will throw exception if captain does not exist
-    return await this.API.MWcombatwz(captainId, 'acti');
+    let data = await this.API.MWcombatwz(captainId, 'acti');
+    if (Object.keys(data).length == 0) throw new Error('No Player Data');
+    return data;
   }
 }

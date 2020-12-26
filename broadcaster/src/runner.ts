@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { Config } from './server';
+import { Config } from './config';
 import {
   Captain,
   KillboardEntry,

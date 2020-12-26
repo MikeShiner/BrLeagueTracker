@@ -1,21 +1,23 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { RegisteredCaptain } from "src/app/services/models/server-models";
 import { TrackerService } from "src/app/services/tracker.service";
 import * as moment from "moment";
-import { skip } from "rxjs/operators";
+import { Subscription } from "rxjs";
 @Component({
   selector: "app-register",
   templateUrl: "./register.component.html",
   styleUrls: ["./register.component.scss"],
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, OnDestroy {
   submitButtonDisable = true;
   submitButtonText = "Let's Go!";
   successMessageShow = false;
   failureMessageShow = false;
   registrationClosed = false;
   failureMessage = "";
+
+  configSubscription: Subscription;
 
   captainForm: FormGroup = new FormGroup({
     captainId: new FormControl("", [Validators.required]),
@@ -28,28 +30,33 @@ export class RegisterComponent implements OnInit {
 
   registeredCaptains: RegisteredCaptain[];
 
-  constructor(private trackerService: TrackerService) {
-    this.trackerService.config$.pipe(skip(1)).subscribe((config) => {
-      let minutesTillDrop: number = moment(config?.startTime).diff(
-        new Date(),
-        "minutes"
-      );
-      if (minutesTillDrop < 31) {
-        this.registrationClosed = true;
-        this.submitButtonDisable = true;
-      } else {
-        this.registrationClosed = false;
-        this.submitButtonDisable = false;
-      }
-    });
-  }
+  constructor(public trackerService: TrackerService) {}
 
   ngOnInit(): void {
     this.captainForm.valueChanges.subscribe((_) => {
       if (this.captainForm.valid) this.submitButtonDisable = false;
     });
 
-    this.getRegisteredCaptains();
+    this.configSubscription = this.trackerService.config$
+      .pipe()
+      .subscribe((config) => {
+        if (!config) return;
+        let minutesTillDrop: number = moment(config?.startTime).diff(
+          new Date(),
+          "minutes"
+        );
+        if (minutesTillDrop < 31) {
+          this.registrationClosed = true;
+          this.submitButtonDisable = true;
+        } else {
+          this.registrationClosed = false;
+        }
+        this.getRegisteredCaptains();
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.configSubscription) this.configSubscription.unsubscribe();
   }
 
   getRegisteredCaptains() {

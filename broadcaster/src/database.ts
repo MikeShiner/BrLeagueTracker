@@ -7,7 +7,7 @@ export class Database {
   private readonly Captains_Table_Name = 'BrLeagues-Warzone-Captains';
   constructor() {
     AWS.config.update({
-      region: 'eu-west-1',
+      region: 'eu-west-2',
     });
 
     if (process.env.devMode) {

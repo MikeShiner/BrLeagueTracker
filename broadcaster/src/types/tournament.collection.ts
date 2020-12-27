@@ -1,5 +1,5 @@
 import { KillboardEntry, LeaderboardEntry, TeamScoreboards } from '.';
-import { Config } from '../server';
+import { Config } from '../config';
 
 export interface TournamentCollection {
   week: number;

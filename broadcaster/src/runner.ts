@@ -18,7 +18,7 @@ export class Runner {
     platform: 'battle',
     ratelimit: { maxRequests: 1, perMilliseconds: 2000 },
   });
-  private isFirstRun = true;
+
   constructor(private config: Config, private username: string, private password: string) {}
 
   setConfig(config: Config) {

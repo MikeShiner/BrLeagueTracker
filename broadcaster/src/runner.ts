@@ -207,6 +207,8 @@ export class Runner {
     return { killboard, leaderboard };
   }
 
+  private calculateAwards() {}
+
   /*******
    * Helper Functions
    *******/

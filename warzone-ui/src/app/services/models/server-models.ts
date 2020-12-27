@@ -1,7 +1,7 @@
-export interface awards {
-  mostRevives: {
-    name: string;
-  };
+export interface Award {
+  awardName: string;
+  playerName: string;
+  value: any;
 }
 
 export interface RegisteredCaptain {

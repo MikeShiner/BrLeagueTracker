@@ -27,7 +27,7 @@ export class Runner {
 
   async runnerLoop() {
     console.log('Runner loop started at ', new Date());
-    let teamScoreboardLocalCache = [];
+    let teamScoreboardLocalCache: TeamScoreboards[] = [];
     for (let captain of this.config.captains) {
       const captainsMatches: Match[] = await this.filterLast20Matches(captain);
       const wholeTeamMatches: Match[][] = await this.loadFullDetailMatches(captain, captainsMatches);
@@ -42,9 +42,23 @@ export class Runner {
     );
 
     let { killboard, leaderboard } = this.calculateLeaderboards(teamScoreboardLocalCache);
+
+    let totalGamesPlayed = 0;
+    teamScoreboardLocalCache.forEach((board) => (totalGamesPlayed = totalGamesPlayed + board.scoreboards.length));
+
+    if (
+      teamScoreboardLocalCache.length > 0 &&
+      this.config.numberOfGames * teamScoreboardLocalCache.length === totalGamesPlayed
+    ) {
+      leaderboard[0].winner = true;
+      // calculate awards
+      console.log(`Tournament Ended at ${new Date().toISOString()}, winner is: ${leaderboard[0].team}`);
+    }
+
     this.teamScoreboardUpdates$.next(teamScoreboardLocalCache);
     this.killboardUpdates$.next(killboard);
     this.leaderboardUpdates$.next(leaderboard);
+
     console.log('Runner cycle complete');
   }
 

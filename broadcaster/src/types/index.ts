@@ -16,6 +16,7 @@ export interface LeaderboardEntry {
   totalKills: number;
   points: number;
   gamesPlayed: number;
+  winner?: boolean;
 }
 
 export interface TeamScoreboards {

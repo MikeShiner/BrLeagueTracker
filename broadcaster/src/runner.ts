@@ -43,9 +43,9 @@ export class Runner {
 
     let { killboard, leaderboard } = this.calculateLeaderboards(teamScoreboardLocalCache);
 
+    // Check to see if tournament has ended. Declare the winner if so.
     let totalGamesPlayed = 0;
     teamScoreboardLocalCache.forEach((board) => (totalGamesPlayed = totalGamesPlayed + board.scoreboards.length));
-
     if (
       teamScoreboardLocalCache.length > 0 &&
       this.config.numberOfGames * teamScoreboardLocalCache.length === totalGamesPlayed

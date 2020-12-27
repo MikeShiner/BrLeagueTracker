@@ -1,3 +1,9 @@
+export interface awards {
+  mostRevives: {
+    name: string;
+  };
+}
+
 export interface RegisteredCaptain {
   timestamp: string;
   teamName: string;

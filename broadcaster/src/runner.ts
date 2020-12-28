@@ -6,6 +6,7 @@ import {
   LeaderboardEntry,
   Match,
   MatchScoreboard,
+  PlayerAward,
   PlayerScore,
   TeamScoreboards,
 } from './types';
@@ -13,6 +14,7 @@ export class Runner {
   teamScoreboardUpdates$: BehaviorSubject<TeamScoreboards[]> = new BehaviorSubject<TeamScoreboards[]>([]);
   leaderboardUpdates$: BehaviorSubject<LeaderboardEntry[]> = new BehaviorSubject<LeaderboardEntry[]>([]);
   killboardUpdates$: BehaviorSubject<KillboardEntry[]> = new BehaviorSubject<KillboardEntry[]>([]);
+  playerAwards: PlayerAward[] = [];
 
   private API = require('call-of-duty-api')({
     platform: 'battle',
@@ -52,6 +54,7 @@ export class Runner {
     ) {
       leaderboard[0].winner = true;
       // calculate awards
+      this.playerAwards = this.calculateAwards(killboard);
       console.log(`Tournament Ended at ${new Date().toISOString()}, winner is: ${leaderboard[0].team}`);
     }
 
@@ -131,6 +134,9 @@ export class Runner {
           kd: playerMatch.playerStats.kdRatio,
           damage: playerMatch.playerStats.damageDone,
           revives: playerMatch.playerStats.objectiveReviver ?? 0,
+          longestKillStreak: playerMatch.playerStats.longestStreak ?? 0,
+          gulagKills: playerMatch.playerStats.gulagKills,
+          gulagDeaths: playerMatch.playerStats.gulagDeaths,
         };
         matchScoreboard.players.push(playerScore);
       });
@@ -171,10 +177,18 @@ export class Runner {
               kills: player.kills,
               team: team.captain.teamName,
               damage: player.damage,
+              revives: player.revives,
+              deaths: player.deaths,
+              gulagKills: player.gulagKills,
+              gulagDeaths: player.gulagDeaths,
             });
           } else {
             killboard[killboardPlayerIndex].kills += player.kills;
             killboard[killboardPlayerIndex].damage += player.damage ?? 0;
+            killboard[killboardPlayerIndex].revives += player.revives ?? 0;
+            killboard[killboardPlayerIndex].deaths += player.deaths ?? 0;
+            killboard[killboardPlayerIndex].gulagKills += player.gulagKills ?? 0;
+            killboard[killboardPlayerIndex].gulagDeaths += player.gulagDeaths ?? 0;
           }
         });
       }
@@ -207,7 +221,50 @@ export class Runner {
     return { killboard, leaderboard };
   }
 
-  private calculateAwards() {}
+  private calculateAwards(killboard: KillboardEntry[]): PlayerAward[] {
+    let playerAwards: PlayerAward[] = [];
+
+    // Medic - Most Revives
+    let reviveboard = this.killboardSecondSortOnDamage(killboard, 'revives');
+    playerAwards.push({
+      awardName: 'Medic Of The Week',
+      description: 'Most Revives',
+      playerName: reviveboard[0].name,
+      team: reviveboard[0].team,
+      value: reviveboard[0].revives + ' Revives',
+    });
+
+    // Most Deaths
+    let deathboard = this.killboardSecondSortOnDamage(killboard, 'deaths');
+    playerAwards.push({
+      awardName: 'Meat Shield',
+      description: 'Most Deaths',
+      playerName: deathboard[0].name,
+      team: deathboard[0].team,
+      value: deathboard[0].deaths + ' Deaths',
+    });
+
+    let gulagRatioBoard = killboard.sort((a, b) => {
+      let sortResult =
+        this.calculateGulagWinRate(a.gulagKills, a.gulagDeaths) -
+        this.calculateGulagWinRate(b.gulagKills, b.gulagDeaths);
+      if (sortResult == 0) {
+        return a.gulagKills - b.gulagKills * -1;
+      }
+      return sortResult * -1;
+    });
+    playerAwards.push({
+      awardName: '1v1 King',
+      description: 'Best Gulag Win Rate',
+      playerName: gulagRatioBoard[0].name,
+      team: gulagRatioBoard[0].team,
+      value: `${this.calculateGulagWinRate(
+        gulagRatioBoard[0].gulagKills,
+        gulagRatioBoard[0].gulagDeaths
+      )}% Gulags Won (${gulagRatioBoard[0].gulagKills} Wins)`,
+    });
+    return playerAwards;
+  }
 
   /*******
    * Helper Functions
@@ -218,6 +275,18 @@ export class Runner {
    * So any player's match will do.
    * @param match
    */
+
+  private calculateGulagWinRate(kills: number, deaths: number) {
+    if (kills === 0 || kills + deaths === 0) return 0;
+    return (kills / (kills + deaths)) * 100;
+  }
+
+  public killboardSecondSortOnDamage(arr: KillboardEntry[], sortKey: string) {
+    return arr.sort((a, b) => {
+      if (a[sortKey] - b[sortKey] === 0) return (a.damage - b.damage) * -1;
+      return (a[sortKey] - b[sortKey]) * -1;
+    });
+  }
 
   public generateDefaultUpdates() {
     let teamScoreboards: TeamScoreboards[] = [];

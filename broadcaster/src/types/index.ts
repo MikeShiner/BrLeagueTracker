@@ -1,9 +1,21 @@
+export interface PlayerAward {
+  awardName: string;
+  description: string;
+  playerName: string;
+  team: string;
+  value: any;
+}
+
 export interface KillboardEntry {
   name: string;
   kills: number;
   team: string;
   pos?: number;
   damage: number;
+  revives: number;
+  deaths: number;
+  gulagKills: number;
+  gulagDeaths: number;
 }
 
 export interface Captain {
@@ -47,6 +59,9 @@ export interface PlayerScore {
   kd: number;
   damage: number;
   revives: number;
+  longestKillStreak: number;
+  gulagKills: number;
+  gulagDeaths: number;
 }
 
 export interface Match {

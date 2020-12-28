@@ -56,6 +56,7 @@ class Server {
     this.app.post('/config', this.newConfigRequest.bind(this));
     this.app.get('/captains', this.getAllCaptains.bind(this));
     this.app.post('/captains/register', this.registerCaptain.bind(this));
+    this.app.get('/awards', this.getPlayerAwards.bind(this));
 
     // Server angular
     this.app.use('/', function (req: Request, res: Response) {
@@ -128,6 +129,10 @@ class Server {
   private async getAllCaptains(req: Request, res: Response) {
     const allCaptains = await this.database.getRegisteredCaptains(this.config.startTime.toISOString());
     res.send(allCaptains);
+  }
+
+  private async getPlayerAwards(req: Request, res: Response) {
+    res.send(this.runner.playerAwards);
   }
 
   private setupInitialValuesWsRoute() {

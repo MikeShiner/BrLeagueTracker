@@ -64,6 +64,28 @@
       </div>
     </div>
   </div>
+  <div class="row" *ngIf="trackerService.awards">
+    <div class="col-sm-6 col-md-4" *ngFor="let award of trackerService.awards">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">{{ award.awardName }}</h4>
+          <p _ngcontent-yyh-c145="" class="category">{{ award.description }}</p>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-6">
+              <img class="perk" src="assets/img/perks/{{ award.icon }}.png" />
+            </div>
+            <div class="col-6">
+              <p class="player-name-award">{{ award.playerName }}</p>
+              <p class="team-name-award">{{ award.team }}</p>
+              <p>{{ award.value }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-md-12">
       <div class="card card-plain">

@@ -229,6 +229,7 @@ export class Runner {
     playerAwards.push({
       awardName: 'Medic Of The Week',
       description: 'Most Revives',
+      icon: 'medic',
       playerName: reviveboard[0].name,
       team: reviveboard[0].team,
       value: reviveboard[0].revives + ' Revives',
@@ -238,6 +239,7 @@ export class Runner {
     let deathboard = this.killboardSecondSortOnDamage(killboard, 'deaths');
     playerAwards.push({
       awardName: 'Meat Shield',
+      icon: 'death',
       description: 'Most Deaths',
       playerName: deathboard[0].name,
       team: deathboard[0].team,
@@ -257,6 +259,7 @@ export class Runner {
       awardName: '1v1 King',
       description: 'Best Gulag Win Rate',
       playerName: gulagRatioBoard[0].name,
+      icon: 'grave',
       team: gulagRatioBoard[0].team,
       value: `${this.calculateGulagWinRate(
         gulagRatioBoard[0].gulagKills,

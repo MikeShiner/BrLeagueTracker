@@ -1,6 +1,7 @@
 export interface PlayerAward {
   awardName: string;
   description: string;
+  icon: string;
   playerName: string;
   team: string;
   value: any;

@@ -6,6 +6,7 @@ import { Config } from "./models/config";
 import {
   KillboardEntry,
   LeaderboardEntry,
+  PlayerAward,
   RegisteredCaptain,
   TeamScoreboard,
 } from "./models/server-models";
@@ -28,6 +29,7 @@ export class TrackerService {
   get config() {
     return this.config$.value;
   }
+  public awards: PlayerAward[];
 
   private ws: WebSocket;
   constructor(private _http: HttpClient) {
@@ -41,6 +43,7 @@ export class TrackerService {
       } else if (msg.type === "leaderboard") {
         console.log(msg);
         this._leaderboard = msg.leaderboard;
+        if (msg.leaderboard[0]?.winner) this.getAwards();
         this.leaderboard$.next(msg.leaderboard);
       } else if (msg.type === "teamScoreboards") {
         this._teamScoreboard = msg.teamScoreboard;
@@ -67,5 +70,11 @@ export class TrackerService {
 
   getAllRegisteredCpatains() {
     return this._http.get<RegisteredCaptain[]>(`${environment.api}/captains`);
+  }
+
+  getAwards() {
+    this._http
+      .get<PlayerAward[]>(`${environment.api}/awards`)
+      .subscribe((res) => (this.awards = res));
   }
 }

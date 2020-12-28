@@ -1,6 +1,8 @@
-export interface Award {
+export interface PlayerAward {
   awardName: string;
+  description: string;
   playerName: string;
+  team: string;
   value: any;
 }
 

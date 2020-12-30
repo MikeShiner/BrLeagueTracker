@@ -1,5 +1,6 @@
 .main-panel {
-  &, &[data="red"]{
+  &,
+  &[data="red"] {
     border-color: $danger;
   }
 
@@ -8,38 +9,40 @@
     min-height: calc(100vh - 70px);
   }
 }
-@media screen and (max-width: 768px){
+@media screen and (max-width: 768px) {
   .main-panel .content {
-      padding-left: 15px;
-      padding-right: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
 }
-.logo-img{
+.logo-img {
   width: 35px;
   height: 35px;
   display: block;
   margin-left: 2px;
   position: absolute;
   top: 12px;
-    img{
-        width: 35px;
-    }
+  img {
+    width: 35px;
+  }
 }
-.sidebar, .off-canvas-sidebar{
-  &, &[data="red"]{
+.sidebar,
+.off-canvas-sidebar {
+  &,
+  &[data="red"] {
     @include linear-gradient($danger-states, $danger);
   }
-  &[data="primary"]{
+  &[data="primary"] {
     @include linear-gradient($primary-states, $primary);
   }
 }
-@media screen and (max-width: 991px){
+@media screen and (max-width: 991px) {
   .main-panel {
-      .content {
-      padding-left: 30px !important;
+    .content {
+      padding-left: 15px !important;
     }
   }
-  .fixed-plugin .dropdown-toggle:after{
+  .fixed-plugin .dropdown-toggle:after {
     display: none;
   }
 }

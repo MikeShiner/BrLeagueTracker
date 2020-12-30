@@ -18,6 +18,12 @@
   font-style: italic;
 }
 .perk {
-  height: 80px;
-  width: 80px;
+  max-width: 120px;
+  img {
+    height: 80px;
+    width: 80px;
+  }
+}
+.perk-card {
+  height: 120px;
 }

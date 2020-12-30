@@ -10,6 +10,7 @@ import {
   PlayerScore,
   TeamScoreboards,
 } from './types';
+import DeepClone from 'clone-deep';
 export class Runner {
   teamScoreboardUpdates$: BehaviorSubject<TeamScoreboards[]> = new BehaviorSubject<TeamScoreboards[]>([]);
   leaderboardUpdates$: BehaviorSubject<LeaderboardEntry[]> = new BehaviorSubject<LeaderboardEntry[]>([]);
@@ -225,7 +226,7 @@ export class Runner {
     let playerAwards: PlayerAward[] = [];
 
     // Medic - Most Revives
-    let reviveboard = this.killboardSecondSortOnDamage(killboard, 'revives');
+    let reviveboard = this.killboardSecondSortOnDamage(DeepClone(killboard), 'revives');
     playerAwards.push({
       awardName: 'Medic Of The Week',
       description: 'Most Revives',
@@ -236,7 +237,7 @@ export class Runner {
     });
 
     // Most Deaths
-    let deathboard = this.killboardSecondSortOnDamage(killboard, 'deaths');
+    let deathboard = this.killboardSecondSortOnDamage(DeepClone(killboard), 'deaths');
     playerAwards.push({
       awardName: 'Meat Shield',
       icon: 'death',
@@ -246,7 +247,7 @@ export class Runner {
       value: deathboard[0].deaths + ' Deaths',
     });
 
-    let gulagRatioBoard = killboard.sort((a, b) => {
+    let gulagRatioBoard = DeepClone(killboard).sort((a, b) => {
       let sortResult =
         this.calculateGulagWinRate(a.gulagKills, a.gulagDeaths) -
         this.calculateGulagWinRate(b.gulagKills, b.gulagDeaths);
@@ -256,7 +257,7 @@ export class Runner {
       return sortResult * -1;
     });
     playerAwards.push({
-      awardName: '1v1 King',
+      awardName: 'Survivor',
       description: 'Best Gulag Win Rate',
       playerName: gulagRatioBoard[0].name,
       icon: 'grave',

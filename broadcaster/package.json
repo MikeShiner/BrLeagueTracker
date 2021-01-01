@@ -21,6 +21,7 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-ws": "^4.0.0",
+    "greenlock-express": "^4.0.3",
     "rxjs": "^6.6.3",
     "ws": "^7.3.1"
   },

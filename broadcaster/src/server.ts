@@ -63,9 +63,28 @@ class Server {
       res.status(200).sendFile(`/`, { root: __dirname + '/ui' });
     });
 
-    this.app.listen(port, function () {
-      console.log('BR Tracker started on port: ' + port);
-    });
+    if (!process.env.ssl) {
+      this.app.listen(port, function () {
+        console.log('BR Tracker started on port: ' + port);
+      });
+    } else {
+      require('greenlock-express')
+        .init({
+          packageRoot: __dirname,
+
+          // contact for security and critical bug notices
+          maintainerEmail: 'mike.shiner00@gmail.com',
+
+          // where to look for configuration
+          configDir: './greenlock.d',
+
+          // whether or not to run at cloudscale
+          cluster: false,
+        })
+        // Serves on 80 and 443
+        // Get's SSL certificates magically!
+        .serve(this.app);
+    }
   }
 
   async startRunner() {

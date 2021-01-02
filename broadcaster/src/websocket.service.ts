@@ -1,9 +1,9 @@
 import https from 'https';
 import http from 'http';
 import ws from 'ws';
-import { app } from '../app';
+import { app } from './app';
 import WebSocket from 'ws';
-import { KillboardEntry, LeaderboardEntry, TeamScoreboards } from '../types';
+import { KillboardEntry, LeaderboardEntry, TeamScoreboards } from './types';
 
 export class WebSocketService {
   wsServer: ws.Server;

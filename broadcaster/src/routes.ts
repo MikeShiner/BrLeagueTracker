@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
-import { app } from '../app';
-import { CaptainCollection } from '../types/captain.collection';
+import { app } from './app';
+import { CaptainCollection } from './types/captain.collection';
 const router: express.Router = express.Router();
 
 // New Config

@@ -29,7 +29,6 @@ export class Runner {
   }
 
   async runnerLoop() {
-    console.log('runnerLoop', this.config);
     console.log('Runner loop started at ', new Date());
     let teamScoreboardLocalCache: TeamScoreboards[] = [];
     for (let captain of this.config.captains) {

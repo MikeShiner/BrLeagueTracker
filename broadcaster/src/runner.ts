@@ -25,10 +25,13 @@ export class Runner {
   constructor(private config: Config, private username: string, private password: string) {}
 
   setConfig(config: Config) {
+    console.log('setConfig', config);
+    this.playerAwards = [];
     this.config = config;
   }
 
   async runnerLoop() {
+    console.log('runnerLoop', this.config);
     console.log('Runner loop started at ', new Date());
     let teamScoreboardLocalCache: TeamScoreboards[] = [];
     for (let captain of this.config.captains) {

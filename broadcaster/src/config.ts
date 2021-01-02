@@ -10,7 +10,9 @@ export class Config {
   captains: Captain[] = [];
   blacklistMatches: string[];
 
-  constructor(
+  constructor() {}
+
+  updateConfig(
     captains: Captain[],
     playlistThisWeek: string,
     weekNumber: number,

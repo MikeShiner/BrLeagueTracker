@@ -8,6 +8,8 @@ import { Database } from './database';
 import { CaptainCollection } from './types/captain.collection';
 import cors from 'cors';
 import { Config } from './config';
+import https from 'https';
+import http from 'http';
 class Server {
   config: Config;
   runner: Runner;
@@ -23,13 +25,48 @@ class Server {
   private runnerInterval;
   app;
   wss;
-  constructor(port: string) {
+  constructor(port: number) {
+    let server: http.Server | https.Server;
     this.app = express();
     this.database = new Database();
-
     this.app.use(express.json());
     this.app.use(cors());
-    this.wss = expressWs(this.app);
+
+    if (process.env.ssl) {
+      const greenlock = require('greenlock-express')
+        .init({
+          packageRoot: __dirname,
+          maintainerEmail: 'mike.shiner00@gmail.com',
+          configDir: './greenlock.d',
+          cluster: false,
+        })
+        // Serves on 80 and 443
+        // Get's SSL certificates magically!
+        .ready((glx) => {
+          var httpsServer = glx.httpsServer(this.app);
+
+          httpsServer.listen(443, '0.0.0.0', function () {
+            console.info('Listening on ', httpsServer.address());
+          });
+
+          // Note:
+          // You must ALSO listen on port 80 for ACME HTTP-01 Challenges
+          // (the ACME and http->https middleware are loaded by glx.httpServer)
+          var httpServer = glx.httpServer(this.app);
+
+          httpServer.listen(80, '0.0.0.0', function () {
+            console.info('Listening on ', httpServer.address());
+          });
+          this.wss = expressWs(this.app, httpsServer);
+        });
+    } else {
+      server = http.createServer(this.app);
+      this.wss = expressWs(this.app, server);
+      server.listen(port, () => {
+        console.log('Tracker started on port ', port);
+      });
+    }
+
     this.setupInitialValuesWsRoute();
 
     if (process.env.devMode) {
@@ -62,29 +99,6 @@ class Server {
     this.app.use('/', function (req: Request, res: Response) {
       res.status(200).sendFile(`/`, { root: __dirname + '/ui' });
     });
-
-    if (!process.env.ssl) {
-      this.app.listen(port, function () {
-        console.log('BR Tracker started on port: ' + port);
-      });
-    } else {
-      require('greenlock-express')
-        .init({
-          packageRoot: __dirname,
-
-          // contact for security and critical bug notices
-          maintainerEmail: 'mike.shiner00@gmail.com',
-
-          // where to look for configuration
-          configDir: './greenlock.d',
-
-          // whether or not to run at cloudscale
-          cluster: false,
-        })
-        // Serves on 80 and 443
-        // Get's SSL certificates magically!
-        .serve(this.app);
-    }
   }
 
   async startRunner() {
@@ -238,14 +252,14 @@ class Server {
   private newConfigRequest(req: Request, res: Response) {
     console.log('New config received..');
     let newConfig = req.body;
-    this.config = new Config(
-      newConfig.captains,
-      newConfig.playlistThisWeek,
-      newConfig.weekNumber,
-      newConfig.numberOfGames,
-      newConfig.startTime,
-      newConfig.blacklistMatches
-    );
+    // this.config = new Config(
+    //   newConfig.captains,
+    //   newConfig.playlistThisWeek,
+    //   newConfig.weekNumber,
+    //   newConfig.numberOfGames,
+    //   newConfig.startTime,
+    //   newConfig.blacklistMatches
+    // );
     this.refreshConfig();
     res.sendStatus(200);
   }
@@ -257,4 +271,4 @@ class Server {
     this.runner.setConfig(this.config);
   }
 }
-new Server(process.env.port);
+new Server(+process.env.port);

@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  websocketEndpoint: "wss://brleagues.com/updates",
-  api: "http://localhost:8080",
+  websocketEndpoint: "ws://localhost:8081",
+  api: "http://localhost:8081",
   // api: "brleagues.com/updates",
 };
 

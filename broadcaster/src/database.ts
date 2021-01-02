@@ -45,8 +45,6 @@ export class Database {
   }
 
   async createTableIfNotExists() {
-    // this.dynamodb.
-
     var params: DynamoDB.Types.CreateTableInput = {
       TableName: this.Captains_Table_Name,
       KeySchema: [

@@ -40,6 +40,7 @@ export class TrackerService {
       if (msg.type === "config") {
         this._config = msg.config;
         this.config$.next(msg.config);
+        this.awards = [];
       } else if (msg.type === "leaderboard") {
         console.log(msg);
         this._leaderboard = msg.leaderboard;

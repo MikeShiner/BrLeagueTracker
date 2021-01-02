@@ -25,8 +25,6 @@ export class Runner {
   constructor(private config: Config, private username: string, private password: string) {}
 
   setConfig(config: Config) {
-    console.log('setConfig', config);
-    this.playerAwards = [];
     this.config = config;
   }
 

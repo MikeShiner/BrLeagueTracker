@@ -17,6 +17,7 @@ import { ScoreboardComponent } from "./pages/scoreboard/scoreboard.component";
 import { TrackerService } from "./services/tracker.service";
 
 import { MatTabsModule } from "@angular/material/tabs";
+import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { RulesComponent } from "./pages/rules/rules.component";
 import { RegisterComponent } from "./pages/register/register.component";
 import { OrdinalDatePipe } from "./pipes/ordinal-date.pipe";
@@ -31,6 +32,7 @@ import { OrdinalDatePipe } from "./pipes/ordinal-date.pipe";
     AppRoutingModule,
     ToastrModule.forRoot(),
     MatTabsModule,
+    MatButtonToggleModule,
     ReactiveFormsModule,
   ],
   declarations: [

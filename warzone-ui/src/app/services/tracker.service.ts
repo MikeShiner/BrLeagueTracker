@@ -15,6 +15,9 @@ import {
   providedIn: "root",
 })
 export class TrackerService {
+  private apiEndpoint: string;
+  private websocketEndpoint: string;
+
   private _leaderboard: LeaderboardEntry[] = [];
   leaderboard$: BehaviorSubject<LeaderboardEntry[]> = new BehaviorSubject([]);
 
@@ -33,7 +36,8 @@ export class TrackerService {
 
   private ws: WebSocket;
   constructor(private _http: HttpClient) {
-    this.ws = new WebSocket(`${environment.websocketEndpoint}`);
+    this.discoverEndpoints();
+    this.ws = new WebSocket(this.websocketEndpoint);
     this.ws.onmessage = ({ data }) => {
       let msg = JSON.parse(data);
       console.log(msg);
@@ -56,12 +60,26 @@ export class TrackerService {
     };
   }
 
+  private discoverEndpoints() {
+    const hostname = window && window.location && window.location.hostname;
+
+    if (/^.*localhost.*/.test(hostname)) {
+      this.apiEndpoint = "http://localhost:8080";
+      this.websocketEndpoint = "ws://localhost:8080";
+    } else if (/^.*brleagues.*/.test(hostname)) {
+      this.apiEndpoint = "https://brleagues.com";
+      this.websocketEndpoint = "wss://brleagues.com";
+    } else {
+      console.warn(`Cannot find environment for host name ${hostname}`);
+    }
+  }
+
   submitCaptainRegistration(
     captainId: string,
     teamName: string,
     mobile: string
   ) {
-    return this._http.post(`${environment.api}/captains/register`, {
+    return this._http.post(`${this.apiEndpoint}/captains/register`, {
       timestamp: new Date().toISOString(),
       teamName,
       captainId,
@@ -70,12 +88,12 @@ export class TrackerService {
   }
 
   getAllRegisteredCpatains() {
-    return this._http.get<RegisteredCaptain[]>(`${environment.api}/captains`);
+    return this._http.get<RegisteredCaptain[]>(`${this.apiEndpoint}/captains`);
   }
 
   getAwards() {
     this._http
-      .get<PlayerAward[]>(`${environment.api}/awards`)
+      .get<PlayerAward[]>(`${this.apiEndpoint}/awards`)
       .subscribe((res) => (this.awards = res));
   }
 }

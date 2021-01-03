@@ -16,14 +16,14 @@ export class Server {
 
   runner: Runner;
   runnerInterval: NodeJS.Timeout;
-  // Wheter or not to login and clear the board
+  // Whether or not to login and clear the board
   isFirstRun: boolean = true;
 
   teamScoreboardSub: Subscription;
   leaderboardSub: Subscription;
   killboardSub: Subscription;
 
-  constructor() {
+  constructor(ssl: boolean) {
     this.app.use(express.json());
     this.app.use(cors());
 
@@ -34,8 +34,25 @@ export class Server {
       res.status(200).sendFile(`/`, { root: __dirname + '/ui' });
     });
 
-    this.server = this.app.listen(8081, () => console.log('started server on port 8081'));
-    this.websocketService = new WebSocketService(this.server);
+    if (ssl) {
+      require('greenlock-express')
+        .init({
+          packageRoot: __dirname,
+          configDir: './greenlock.d',
+
+          maintainerEmail: 'jon@example.com',
+          cluster: false,
+        })
+        .ready((glx) => {
+          this.server = glx.httpsServer();
+          this.websocketService = new WebSocketService(this.server);
+          glx.serveApp(this.app);
+        });
+    } else {
+      let port = process.env.port ?? 8080;
+      this.server = this.app.listen(port, () => console.log('started server on port ' + port));
+      this.websocketService = new WebSocketService(this.server);
+    }
   }
 
   async startRunner() {

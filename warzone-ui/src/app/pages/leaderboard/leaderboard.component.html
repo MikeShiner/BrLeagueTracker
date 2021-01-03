@@ -90,7 +90,7 @@
     <div class="col-md-12">
       <div class="card card-plain">
         <div class="card-header">
-          <h3 class="card-title">Killboard</h3>
+          <h3 class="card-title">Player Leaderboard</h3>
           <p class="category">
             Total player kills scoreboard. Players who share a position will be
             sorted based on total damage across all played games.
@@ -103,18 +103,26 @@
                 <tr>
                   <th>Pos.</th>
                   <th>Player</th>
-                  <th class="text-center">Total Kills</th>
+                  <th class="text-center">Total {{ tableType }}</th>
                   <th class="text-right">Team</th>
                 </tr>
               </thead>
               <tbody>
-                <ng-container
-                  *ngFor="let entry of trackerService.killboard$ | async"
-                >
+                <ng-container *ngFor="let entry of data">
                   <tr>
                     <td>{{ entry.pos }}</td>
-                    <td>{{ entry.name }}</td>
-                    <td class="text-center">{{ entry.kills }}</td>
+                    <td>
+                      <a
+                        href="https://cod.tracker.gg/warzone/profile/atvi/{{
+                          entry.name
+                        }}"
+                        >{{ entry.name }}
+                        <i
+                          class="fas fa-external-link-alt external-link-icon"
+                        ></i
+                      ></a>
+                    </td>
+                    <td class="text-center">{{ entry[tableType] }}</td>
                     <td class="text-right">{{ entry.team }}</td>
                   </tr>
                 </ng-container>

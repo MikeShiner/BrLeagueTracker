@@ -17,6 +17,14 @@
         "--remote-debugging-port=9222",
         "--disable-background-networking"
       ]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Node: Nodemon",
+      "processId": "${command:PickProcess}",
+      "restart": true,
+      "protocol": "inspector"
     }
   ]
 }

@@ -17,6 +17,8 @@ export interface KillboardEntry {
   deaths: number;
   gulagKills: number;
   gulagDeaths: number;
+  headshots: number;
+  boxesLooted: number;
 }
 
 export interface Captain {
@@ -63,6 +65,8 @@ export interface PlayerScore {
   longestKillStreak: number;
   gulagKills: number;
   gulagDeaths: number;
+  headshots: number;
+  boxesLooted: number;
 }
 
 export interface Match {

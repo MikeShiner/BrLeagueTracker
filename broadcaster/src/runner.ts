@@ -138,6 +138,8 @@ export class Runner {
           longestKillStreak: playerMatch.playerStats.longestStreak ?? 0,
           gulagKills: playerMatch.playerStats.gulagKills,
           gulagDeaths: playerMatch.playerStats.gulagDeaths,
+          headshots: playerMatch.playerStats.headshots,
+          boxesLooted: playerMatch.playerStats.objectiveBrCacheOpen ?? 0,
         };
         matchScoreboard.players.push(playerScore);
       });
@@ -182,6 +184,8 @@ export class Runner {
               deaths: player.deaths,
               gulagKills: player.gulagKills,
               gulagDeaths: player.gulagDeaths,
+              headshots: player.headshots,
+              boxesLooted: player.boxesLooted,
             });
           } else {
             killboard[killboardPlayerIndex].kills += player.kills;
@@ -190,6 +194,7 @@ export class Runner {
             killboard[killboardPlayerIndex].deaths += player.deaths ?? 0;
             killboard[killboardPlayerIndex].gulagKills += player.gulagKills ?? 0;
             killboard[killboardPlayerIndex].gulagDeaths += player.gulagDeaths ?? 0;
+            killboard[killboardPlayerIndex].headshots += player.headshots ?? 0;
           }
         });
       }
@@ -247,6 +252,7 @@ export class Runner {
       value: deathboard[0].deaths + ' Deaths',
     });
 
+    // Gulag win ratio
     let gulagRatioBoard = DeepClone(killboard).sort((a, b) => {
       let sortResult =
         this.calculateGulagWinRate(a.gulagKills, a.gulagDeaths) -
@@ -256,6 +262,7 @@ export class Runner {
       }
       return sortResult * -1;
     });
+
     playerAwards.push({
       awardName: 'Survivor',
       description: 'Best Gulag Win Rate',
@@ -267,6 +274,45 @@ export class Runner {
         gulagRatioBoard[0].gulagDeaths
       )}% Gulags Won (${gulagRatioBoard[0].gulagKills} Wins)`,
     });
+
+    // Dead WeightAward - Least Damage
+    let deadWeightAward = DeepClone(killboard).sort((a: KillboardEntry, b: KillboardEntry) => {
+      a.damage - b.damage;
+    });
+
+    playerAwards.push({
+      awardName: 'Dead Weight',
+      description: 'Lowest Damage',
+      playerName: deadWeightAward[0].name,
+      icon: 'deadweight',
+      team: deadWeightAward[0].team,
+      value: `${deadWeightAward[0].damage} Damage`,
+    });
+
+    // Sharpshooter - Most Headshots
+    let headshotsAward = this.killboardSecondSortOnDamage(DeepClone(killboard), 'headshots');
+
+    playerAwards.push({
+      awardName: 'Sharpshooter',
+      description: 'Most Headshots',
+      playerName: headshotsAward[0].name,
+      icon: 'sharpshooter',
+      team: headshotsAward[0].team,
+      value: `${headshotsAward[0].headshots} Headshots`,
+    });
+
+    // Sharpshooter - Most Headshots
+    let lootboxAward = this.killboardSecondSortOnDamage(DeepClone(killboard), 'boxesLooted');
+
+    playerAwards.push({
+      awardName: 'Scavenger',
+      description: 'Most Boxes Looted',
+      playerName: lootboxAward[0].name,
+      icon: 'scavenger',
+      team: lootboxAward[0].team,
+      value: `${lootboxAward[0].boxesLooted} Boxes Looted`,
+    });
+
     return playerAwards;
   }
 

@@ -276,9 +276,7 @@ export class Runner {
     });
 
     // Dead WeightAward - Least Damage
-    let deadWeightAward = DeepClone(killboard).sort((a: KillboardEntry, b: KillboardEntry) => {
-      a.damage - b.damage;
-    });
+    let deadWeightAward = DeepClone(killboard).sort((a: KillboardEntry, b: KillboardEntry) => a.damage - b.damage);
 
     playerAwards.push({
       awardName: 'Dead Weight',

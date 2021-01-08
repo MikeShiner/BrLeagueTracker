@@ -58,8 +58,8 @@ export class Server {
   async startRunner() {
     if (this.runnerInterval) {
       clearInterval(this.runnerInterval);
-      // Wait 10 seconds for previous loop to finish after clearing interval
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+      // Wait 4 minutes for previous loop to finish after clearing interval
+      await new Promise((resolve) => setTimeout(resolve, 240000));
     }
 
     if (this.isFirstRun) {
@@ -79,7 +79,7 @@ export class Server {
     }
 
     await this.runner.runnerLoop();
-    this.runnerInterval = setInterval(async () => await this.runner.runnerLoop(), 1 * 240000); // 4 minutes
+    this.runnerInterval = setInterval(async () => await this.runner.runnerLoop(), 1 * 120000); // 2 minutes
   }
 
   loadNewConfig() {

@@ -12,6 +12,7 @@ import {
 } from './types';
 import DeepClone from 'clone-deep';
 export class Runner {
+  private teamScoreboardLocalCache: TeamScoreboards[] = [];
   teamScoreboardUpdates$: BehaviorSubject<TeamScoreboards[]> = new BehaviorSubject<TeamScoreboards[]>([]);
   leaderboardUpdates$: BehaviorSubject<LeaderboardEntry[]> = new BehaviorSubject<LeaderboardEntry[]>([]);
   killboardUpdates$: BehaviorSubject<KillboardEntry[]> = new BehaviorSubject<KillboardEntry[]>([]);
@@ -30,28 +31,42 @@ export class Runner {
 
   async runnerLoop() {
     console.log('Runner loop started at ', new Date());
-    let teamScoreboardLocalCache: TeamScoreboards[] = [];
-    for (let captain of this.config.captains) {
-      const captainsMatches: Match[] = await this.filterLast20Matches(captain);
-      const wholeTeamMatches: Match[][] = await this.loadFullDetailMatches(captain, captainsMatches);
-      const teamScoreboard: TeamScoreboards = this.calculateTeamScoreboards(captain, wholeTeamMatches);
+    let captainQueue: Captain[] = DeepClone(this.config.captains) as Captain[];
 
-      teamScoreboardLocalCache.push(teamScoreboard);
-      console.log('Captain ' + captain.id + ' completed.');
+    while (captainQueue.length > 0) {
+      for (let captain of captainQueue) {
+        // If captain doesn't exist in cache, add empty scores
+        if (!this.teamScoreboardLocalCache.find((team) => team.captain.id === captain.id)) {
+          this.teamScoreboardLocalCache.push({ captain, scoreboards: [] });
+        }
+
+        try {
+          await this.getCaptainScoreboardsToCache(captain);
+          let index = captainQueue.findIndex((team) => team.id === captain.id);
+          captainQueue.splice(index, 1);
+          console.log('Captain ' + captain.id + ' completed.');
+        } catch (e) {
+          console.error(
+            `Failure to fetch matches for captain ${captain.id} (${captain.teamName}). Adding to retry queue. Error: `,
+            e
+          );
+        }
+      }
     }
+
     // Add collection to load cache for first WS pulls. Sort teams in alphabetical order.
-    teamScoreboardLocalCache = teamScoreboardLocalCache.sort((a, b) =>
+    this.teamScoreboardLocalCache = this.teamScoreboardLocalCache.sort((a, b) =>
       a.captain.teamName.localeCompare(b.captain.teamName)
     );
 
-    let { killboard, leaderboard } = this.calculateLeaderboards(teamScoreboardLocalCache);
+    let { killboard, leaderboard } = this.calculateLeaderboards(this.teamScoreboardLocalCache);
 
     // Check to see if tournament has ended. Declare the winner if so.
     let totalGamesPlayed = 0;
-    teamScoreboardLocalCache.forEach((board) => (totalGamesPlayed = totalGamesPlayed + board.scoreboards.length));
+    this.teamScoreboardLocalCache.forEach((board) => (totalGamesPlayed = totalGamesPlayed + board.scoreboards.length));
     if (
-      teamScoreboardLocalCache.length > 0 &&
-      this.config.numberOfGames * teamScoreboardLocalCache.length === totalGamesPlayed
+      this.teamScoreboardLocalCache.length > 0 &&
+      this.config.numberOfGames * this.teamScoreboardLocalCache.length === totalGamesPlayed
     ) {
       leaderboard[0].winner = true;
       // calculate awards
@@ -59,11 +74,20 @@ export class Runner {
       console.log(`Tournament Ended at ${new Date().toISOString()}, winner is: ${leaderboard[0].team}`);
     }
 
-    this.teamScoreboardUpdates$.next(teamScoreboardLocalCache);
+    this.teamScoreboardUpdates$.next(this.teamScoreboardLocalCache);
     this.killboardUpdates$.next(killboard);
     this.leaderboardUpdates$.next(leaderboard);
 
     console.log('Runner cycle complete');
+  }
+
+  private async getCaptainScoreboardsToCache(captain: Captain) {
+    const captainsMatches: Match[] = await this.filterLast20Matches(captain);
+    const wholeTeamMatches: Match[][] = await this.loadFullDetailMatches(captain, captainsMatches);
+    const teamScoreboard: TeamScoreboards = this.calculateTeamScoreboards(captain, wholeTeamMatches);
+
+    let index = this.teamScoreboardLocalCache.findIndex((team) => team.captain.id === captain.id);
+    this.teamScoreboardLocalCache[index] = teamScoreboard;
   }
 
   async login() {

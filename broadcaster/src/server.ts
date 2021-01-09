@@ -79,7 +79,7 @@ export class Server {
     }
 
     await this.runner.runnerLoop();
-    this.runnerInterval = setInterval(async () => await this.runner.runnerLoop(), 1 * 120000); // 2 minutes
+    this.runnerInterval = setInterval(async () => await this.runner.runnerLoop(), 1 * 60000); // 1 minutes
   }
 
   loadNewConfig() {

@@ -46,10 +46,7 @@ export class Runner {
           captainQueue.splice(index, 1);
           console.log('Captain ' + captain.id + ' completed.');
         } catch (e) {
-          console.error(
-            `Failure to fetch matches for captain ${captain.id} (${captain.teamName}). Adding to retry queue. Error: `,
-            e
-          );
+          console.error(`Failure to fetch matches for captain ${captain.id} (${captain.teamName}). Error: `, e);
         }
       }
     }

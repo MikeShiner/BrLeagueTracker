@@ -12,14 +12,7 @@
     "renewOffset": "-45d",
     "renewStagger": "3d",
     "accountKeyType": "EC-P256",
-    "serverKeyType": "RSA-2048",
-    "subscriberEmail": "mike.shiner00@gmail.com"
+    "serverKeyType": "RSA-2048"
   },
-  "sites": [
-    {
-      "subject": "brleagues.com",
-      "altnames": ["brleagues.com", "www.brleagues.com"],
-      "renewAt": 1
-    }
-  ]
+  "sites": []
 }

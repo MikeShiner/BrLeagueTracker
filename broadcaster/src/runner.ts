@@ -307,9 +307,8 @@ export class Runner {
       playerName: gulagRatioBoard[0].name,
       icon: 'grave',
       team: gulagRatioBoard[0].team,
-      value: `${this.calculateGulagWinRate(
-        gulagRatioBoard[0].gulagKills,
-        gulagRatioBoard[0].gulagDeaths
+      value: `${this.calculateGulagWinRate(gulagRatioBoard[0].gulagKills, gulagRatioBoard[0].gulagDeaths).toFixed(
+        2
       )}% Gulags Won (${gulagRatioBoard[0].gulagKills} Wins)`,
     });
 

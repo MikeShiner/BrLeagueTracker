@@ -70,11 +70,13 @@ export class Server {
     this.leaderboardSub = this.runner.leaderboardUpdates$.subscribe((s) =>
       this.websocketService.emitLeaderboardUpdate(s)
     );
-    this.runner.loopComplete$.subscribe(() => this.runner.runnerLoop());
+    this.loopCallbackSub = this.runner.loopComplete$.subscribe(() => this.runner.runnerLoop());
   }
 
   async startLoop() {
     this.loopCallbackSub = this.runner.loopComplete$.subscribe(() => this.runner.runnerLoop());
+    if (this.paused) this.runner.runnerLoop();
+    this.paused = false;
   }
 
   async stopLoop() {

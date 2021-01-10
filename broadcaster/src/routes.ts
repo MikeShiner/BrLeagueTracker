@@ -20,14 +20,15 @@ router.post('/config', function (req: Request, res: Response) {
 
 // New Config
 router.post('/runner', function (req: Request, res: Response) {
-  if (req.params.loop === 'true') {
+  if (req.query.loop === 'true') {
     console.log('Request to start Loop...');
     app.startLoop();
   }
-  if (req.params.loop === 'false') {
+  if (req.query.loop === 'false') {
     console.log('Request to stop Loop...');
     app.stopLoop();
   }
+  res.sendStatus(200);
 });
 
 // Get all registered Captains

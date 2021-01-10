@@ -20,6 +20,11 @@ import { MatTabsModule } from "@angular/material/tabs";
 import { RulesComponent } from "./pages/rules/rules.component";
 import { RegisterComponent } from "./pages/register/register.component";
 import { OrdinalDatePipe } from "./pipes/ordinal-date.pipe";
+import {
+  NgxGoogleAnalyticsModule,
+  NgxGoogleAnalyticsRouterModule,
+} from "ngx-google-analytics";
+import { environment } from "src/environments/environment";
 @NgModule({
   imports: [
     BrowserAnimationsModule,
@@ -32,6 +37,10 @@ import { OrdinalDatePipe } from "./pipes/ordinal-date.pipe";
     ToastrModule.forRoot(),
     MatTabsModule,
     ReactiveFormsModule,
+    NgxGoogleAnalyticsModule.forRoot(
+      environment.production ? "G-3FV4WBE7FW" : ""
+    ),
+    NgxGoogleAnalyticsRouterModule,
   ],
   declarations: [
     AppComponent,

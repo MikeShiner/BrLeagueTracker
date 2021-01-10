@@ -1,7 +1,7 @@
 {
   "defaults": {
     "store": {
-      "basePath": "./",
+      "basePath": "./greenlock.d",
       "module": "greenlock-store-fs"
     },
     "challenges": {

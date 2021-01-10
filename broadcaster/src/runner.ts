@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { Config } from './config';
 import {
   Captain,
@@ -16,6 +16,8 @@ export class Runner {
   teamScoreboardUpdates$: BehaviorSubject<TeamScoreboards[]> = new BehaviorSubject<TeamScoreboards[]>([]);
   leaderboardUpdates$: BehaviorSubject<LeaderboardEntry[]> = new BehaviorSubject<LeaderboardEntry[]>([]);
   killboardUpdates$: BehaviorSubject<KillboardEntry[]> = new BehaviorSubject<KillboardEntry[]>([]);
+  loopComplete$: Subject<null> = new Subject();
+
   playerAwards: PlayerAward[] = [];
 
   private API = require('call-of-duty-api')({
@@ -41,7 +43,7 @@ export class Runner {
         }
 
         try {
-          await this.getCaptainScoreboardsToCache(captain);
+          await this.captainDataProcessor(captain);
           let index = captainQueue.findIndex((team) => team.id === captain.id);
           captainQueue.splice(index, 1);
           console.log('Captain ' + captain.id + ' completed.');
@@ -76,9 +78,10 @@ export class Runner {
     this.leaderboardUpdates$.next(leaderboard);
 
     console.log('Runner cycle complete');
+    this.loopComplete$.next();
   }
 
-  private async getCaptainScoreboardsToCache(captain: Captain) {
+  private async captainDataProcessor(captain: Captain) {
     const captainsMatches: Match[] = await this.filterLast20Matches(captain);
     const wholeTeamMatches: Match[][] = await this.loadFullDetailMatches(captain, captainsMatches);
     const teamScoreboard: TeamScoreboards = this.calculateTeamScoreboards(captain, wholeTeamMatches);

@@ -18,10 +18,12 @@ export class Server {
   runnerInterval: NodeJS.Timeout;
   // Whether or not to login and clear the board
   isFirstRun: boolean = true;
+  paused: boolean = false;
 
   teamScoreboardSub: Subscription;
   leaderboardSub: Subscription;
   killboardSub: Subscription;
+  loopCallbackSub: Subscription;
 
   constructor(ssl: boolean) {
     this.app.use(express.json());
@@ -53,40 +55,42 @@ export class Server {
       this.server = this.app.listen(port, () => console.log('started server on port ' + port));
       this.websocketService = new WebSocketService(this.server);
     }
+
+    this.setupRunner();
   }
 
-  async startRunner() {
-    if (this.runnerInterval) {
-      clearInterval(this.runnerInterval);
-      // Wait 4 minutes for previous loop to finish after clearing interval
-      await new Promise((resolve) => setTimeout(resolve, 240000));
-    }
+  async setupRunner() {
+    this.runner = new Runner(this.config, process.env.user, process.env.pass);
+    await this.runner.login();
 
-    if (this.isFirstRun) {
-      this.runner = new Runner(this.config, process.env.user, process.env.pass);
-      await this.runner.login();
-      this.runner.generateDefaultUpdates();
+    this.teamScoreboardSub = this.runner.teamScoreboardUpdates$.subscribe((s) =>
+      this.websocketService.emitTeamScoreboardUpdate(s)
+    );
+    this.killboardSub = this.runner.killboardUpdates$.subscribe((s) => this.websocketService.emitKillboardUpdate(s));
+    this.leaderboardSub = this.runner.leaderboardUpdates$.subscribe((s) =>
+      this.websocketService.emitLeaderboardUpdate(s)
+    );
+    this.runner.loopComplete$.subscribe(() => this.runner.runnerLoop());
+  }
 
-      this.teamScoreboardSub = this.runner.teamScoreboardUpdates$.subscribe((s) =>
-        this.websocketService.emitTeamScoreboardUpdate(s)
-      );
-      this.killboardSub = this.runner.killboardUpdates$.subscribe((s) => this.websocketService.emitKillboardUpdate(s));
-      this.leaderboardSub = this.runner.leaderboardUpdates$.subscribe((s) =>
-        this.websocketService.emitLeaderboardUpdate(s)
-      );
+  async startLoop() {
+    this.loopCallbackSub = this.runner.loopComplete$.subscribe(() => this.runner.runnerLoop());
+  }
 
-      this.isFirstRun = false;
-    }
-
-    await this.runner.runnerLoop();
-    this.runnerInterval = setInterval(async () => await this.runner.runnerLoop(), 1 * 60000); // 1 minutes
+  async stopLoop() {
+    if (this.loopCallbackSub && !this.paused) this.loopCallbackSub.unsubscribe();
+    this.paused = true;
   }
 
   loadNewConfig() {
     console.log('Refreshing Config', this.config);
     this.websocketService.emitConfigUpdate();
-    this.startRunner();
     this.runner.setConfig(this.config);
+    if (this.isFirstRun) {
+      this.isFirstRun = false;
+      this.runner.generateDefaultUpdates();
+      this.runner.runnerLoop();
+    }
   }
 
   loadDevModeDefaults() {

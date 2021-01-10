@@ -18,6 +18,18 @@ router.post('/config', function (req: Request, res: Response) {
   res.sendStatus(200);
 });
 
+// New Config
+router.post('/runner', function (req: Request, res: Response) {
+  if (req.params.loop === 'true') {
+    console.log('Request to start Loop...');
+    app.startLoop();
+  }
+  if (req.params.loop === 'false') {
+    console.log('Request to stop Loop...');
+    app.stopLoop();
+  }
+});
+
 // Get all registered Captains
 router.get('/captains', async (req: Request, res: Response) => {
   const allCaptains = await app.database.getRegisteredCaptains(app.config.startTime.toISOString());

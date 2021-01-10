@@ -24,7 +24,7 @@ export class Runner {
 
   private API = require('call-of-duty-api')({
     platform: 'battle',
-    ratelimit: { maxRequests: 1, perMilliseconds: 2000 },
+    ratelimit: { maxRequests: 1, perMilliseconds: 5000 },
   });
 
   constructor(private config: Config, private username: string, private password: string) {}
@@ -38,6 +38,7 @@ export class Runner {
     let captainQueue: Captain[] = DeepClone(this.config.captains) as Captain[];
     this.teamScoreboardLocalCache = [];
     while (captainQueue.length > 0) {
+      if (this.loopPaused) break;
       for (let captain of captainQueue) {
         // If captain doesn't exist in cache, add empty scores
         if (!this.teamScoreboardLocalCache.find((team) => team.captain.id === captain.id)) {

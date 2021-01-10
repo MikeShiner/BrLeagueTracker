@@ -121,6 +121,7 @@ export class Runner {
   private async filterLast20Matches(captain: Captain) {
     let data = await this.API.MWcombatwz(captain.id, 'acti');
 
+    data.matches = data.matches.filter((m: Match) => !/^.*plun.*/.test(m.mode));
     // Filter out any blacklisted matches
     if (this.config.blacklistMatches && this.config.blacklistMatches.length > 0) {
       data.matches = data.matches.filter((m: Match) => this.config.blacklistMatches.indexOf(m.matchID) === -1);

@@ -12,7 +12,7 @@
     "build-app-prod": "(cd warzone-ui && ng build --prod) && mkdir broadcaster/dist/ui && cp -r warzone-ui/dist/* broadcaster/dist/ui",
     "build-app-dev": "(cd warzone-ui && ng build) && mkdir broadcaster/dist/ui && cp -r warzone-ui/dist/* broadcaster/dist/ui/",
     "build-server": "(cd broadcaster && tsc && cp package.json .greenlockrc dist/ && cp -r src/greenlock.d dist/)",
-    "build-image": "npm run build-all-prod && docker build -t mikeshiner/brleagues-tracker:2.11 ."
+    "build-image": "npm run build-all-prod && docker build -t mikeshiner/brleagues-tracker:2.12 ."
   },
   "repository": {
     "type": "git",

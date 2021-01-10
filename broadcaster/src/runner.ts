@@ -54,12 +54,13 @@ export class Runner {
           if (/^.*429 - Too many requests.*/.test(e)) {
             console.error('Rate limiting detected! Pausing loop..');
             this.loopPaused$.next();
-            captainQueue = [];
             this.loopPaused = true;
+            break;
           }
         }
       }
     }
+
     if (this.loopPaused) {
       this.loopPaused = false;
       return;

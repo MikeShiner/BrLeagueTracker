@@ -83,6 +83,7 @@ export class Server {
   async stopLoop() {
     if (this.loopCallbackSub && !this.paused) this.loopCallbackSub.unsubscribe();
     this.paused = true;
+    console.log('Loop paused.');
   }
 
   loadNewConfig() {

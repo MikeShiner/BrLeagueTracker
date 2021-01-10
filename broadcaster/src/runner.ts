@@ -17,6 +17,8 @@ export class Runner {
   leaderboardUpdates$: BehaviorSubject<LeaderboardEntry[]> = new BehaviorSubject<LeaderboardEntry[]>([]);
   killboardUpdates$: BehaviorSubject<KillboardEntry[]> = new BehaviorSubject<KillboardEntry[]>([]);
   loopComplete$: Subject<null> = new Subject();
+  loopPaused$: Subject<null> = new Subject();
+  loopPaused: boolean = false;
 
   playerAwards: PlayerAward[] = [];
 
@@ -49,8 +51,18 @@ export class Runner {
           console.log('Captain ' + captain.id + ' completed.');
         } catch (e) {
           console.error(`Failure to fetch matches for captain ${captain.id} (${captain.teamName}). Error: `, e);
+          if (/^.*429 - Too many requests.*/.test(e)) {
+            console.error('Rate limiting detected! Pausing loop..');
+            this.loopPaused$.next();
+            captainQueue = [];
+            this.loopPaused = true;
+          }
         }
       }
+    }
+    if (this.loopPaused) {
+      this.loopPaused = false;
+      return;
     }
 
     // Add collection to load cache for first WS pulls. Sort teams in alphabetical order.

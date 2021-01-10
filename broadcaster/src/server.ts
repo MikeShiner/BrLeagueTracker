@@ -71,6 +71,7 @@ export class Server {
       this.websocketService.emitLeaderboardUpdate(s)
     );
     this.loopCallbackSub = this.runner.loopComplete$.subscribe(() => this.runner.runnerLoop());
+    this.runner.loopPaused$.subscribe(() => this.stopLoop());
   }
 
   async startLoop() {

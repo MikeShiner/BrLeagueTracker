@@ -36,7 +36,7 @@ export class Runner {
   async runnerLoop() {
     console.log('Runner loop started at ', new Date());
     let captainQueue: Captain[] = DeepClone(this.config.captains) as Captain[];
-
+    this.teamScoreboardLocalCache = [];
     while (captainQueue.length > 0) {
       for (let captain of captainQueue) {
         // If captain doesn't exist in cache, add empty scores

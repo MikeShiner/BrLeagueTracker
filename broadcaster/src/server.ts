@@ -70,7 +70,8 @@ export class Server {
     this.leaderboardSub = this.runner.leaderboardUpdates$.subscribe((s) =>
       this.websocketService.emitLeaderboardUpdate(s)
     );
-    this.loopCallbackSub = this.runner.loopComplete$.subscribe(() => this.runner.runnerLoop());
+
+    this.loopCallbackSub = this.runner.loopComplete$.subscribe(() => setTimeout(() => this.runner.runnerLoop(), 60000));
     this.runner.loopPaused$.subscribe(() => this.stopLoop());
   }
 

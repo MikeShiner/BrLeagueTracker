@@ -92,6 +92,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
               this.submitButtonText = "Let's Go!";
               this.successMessageShow = true;
               this.captainForm.reset();
+              this.captainForm.get("platform").setValue("xbl");
               this.getRegisteredCaptains();
             }
           },

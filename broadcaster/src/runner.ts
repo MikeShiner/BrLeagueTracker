@@ -120,7 +120,7 @@ export class Runner {
    * @param captain Captain to get last 5 games for.
    */
   private async filterLast20Matches(captain: Captain) {
-    let data = await this.API.MWcombatwz(captain.id, 'acti');
+    let data = await this.API.MWcombatwz(captain.id, captain.platform);
 
     data.matches = data.matches.filter((m: Match) => !/^.*plun.*/.test(m.mode));
     // Filter out any blacklisted matches
@@ -149,7 +149,7 @@ export class Runner {
   private async loadFullDetailMatches(captain: Captain, matches: Match[]) {
     let teamPlayerMatches: Match[][] = [];
     for (let match of matches) {
-      let fullMatch: { allPlayers: Match[] } = await this.API.MWFullMatchInfowz(match.matchID, 'acti');
+      let fullMatch: { allPlayers: Match[] } = await this.API.MWFullMatchInfowz(match.matchID, captain.platform);
       let teamMatch: Match[] = fullMatch.allPlayers.filter((players) => players.player.team === match.player.team);
       teamPlayerMatches.push(teamMatch);
     }
@@ -439,9 +439,9 @@ export class Runner {
     return n + (n > 0 ? ['th', 'st', 'nd', 'rd'][(n > 3 && n < 21) || n % 10 > 3 ? 0 : n % 10] : '');
   }
 
-  async checkCaptainExists(captainId: string) {
+  async checkCaptainExists(captainId: string, platform: string) {
     // Will throw exception if captain does not exist
-    let data = await this.API.MWcombatwz(captainId, 'acti');
+    let data = await this.API.MWcombatwz(captainId, platform);
     if (Object.keys(data).length == 0) throw new Error('No Player Data');
     return data;
   }

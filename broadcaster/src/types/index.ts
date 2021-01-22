@@ -24,6 +24,7 @@ export interface KillboardEntry {
 export interface Captain {
   id: string;
   teamName: string;
+  platform: string;
 }
 
 export interface LeaderboardEntry {

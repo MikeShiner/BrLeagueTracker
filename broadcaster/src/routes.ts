@@ -49,14 +49,16 @@ router.post('/captains/register', async (req: Request, res: Response) => {
   let request: CaptainCollection = req.body;
   request.startTime = app.config.startTime.toISOString();
   try {
-    await app.runner.checkCaptainExists(request.captainId);
+    await app.runner.checkCaptainExists(request.captainId, request.platform);
   } catch (err) {
-    res.status(400).send({ message: 'Activision ID does not exist. Please ensure format is correct.' });
+    res
+      .status(400)
+      .send({ message: 'Cannot find user. Please ensure platform is correct and profile is set to public.' });
     return;
   }
   try {
     await app.database.InsertNewRegisteredCaptain(request);
-    app.config.addCaptain(request.captainId, request.teamName);
+    app.config.addCaptain(request.captainId, request.teamName, request.platform);
     app.loadNewConfig();
 
     res.status(200).send({ message: 'OK' });

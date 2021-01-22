@@ -77,13 +77,13 @@ export class TrackerService {
   submitCaptainRegistration(
     captainId: string,
     teamName: string,
-    mobile: string
+    platform: string
   ) {
     return this._http.post(`${this.apiEndpoint}/captains/register`, {
       timestamp: new Date().toISOString(),
       teamName,
       captainId,
-      mobile,
+      platform,
     });
   }
 

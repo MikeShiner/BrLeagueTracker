@@ -28,7 +28,7 @@ export class Config {
     this.numberOfGames = numberOfGames;
   }
 
-  addCaptain(captainId: string, teamName: string) {
-    this.captains.push({ id: captainId, teamName });
+  addCaptain(captainId: string, teamName: string, platform: string) {
+    this.captains.push({ id: captainId, teamName, platform });
   }
 }

@@ -22,10 +22,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   captainForm: FormGroup = new FormGroup({
     captainId: new FormControl("", [Validators.required]),
     teamName: new FormControl("", [Validators.required]),
-    mobile: new FormControl("", [
-      Validators.required,
-      Validators.minLength(11),
-    ]),
+    platform: new FormControl("xbl"),
   });
 
   registeredCaptains: RegisteredCaptain[];
@@ -86,7 +83,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
         .submitCaptainRegistration(
           this.captainForm.get("captainId").value,
           this.captainForm.get("teamName").value,
-          this.captainForm.get("mobile").value
+          this.captainForm.get("platform").value
         )
         .subscribe(
           (res: { message: string }) => {

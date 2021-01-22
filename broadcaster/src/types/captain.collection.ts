@@ -3,5 +3,5 @@ export interface CaptainCollection {
   timestamp: string;
   teamName: string;
   captainId: string;
-  mobile: number;
+  platform: string;
 }

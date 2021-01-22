@@ -23,9 +23,7 @@
             <div class="row">
               <div class="col-md-4 pr-md-1">
                 <div class="form-group">
-                  <label
-                    >Activision ID <span class="text-danger">*</span></label
-                  >
+                  <label>Platform ID <span class="text-danger">*</span></label>
                   <input
                     formControlName="captainId"
                     class="form-control"
@@ -39,7 +37,7 @@
                       captainForm.get('captainId').touched
                     "
                   >
-                    Activision ID is required.
+                    Platform ID is required.
                   </label>
                 </div>
               </div>
@@ -66,35 +64,12 @@
               </div>
               <div class="col-md-4 pl-md-1">
                 <div class="form-group">
-                  <label
-                    >Mobile Number <span class="text-danger">*</span></label
-                  >
-                  <input
-                    class="form-control"
-                    formControlName="mobile"
-                    placeholder="07xxxxxxxxx"
-                    maxlength="11"
-                    type="text"
-                  />
-
-                  <label
-                    class="text-danger"
-                    *ngIf="
-                      captainForm.get('mobile').errors?.required &&
-                      captainForm.get('mobile').touched
-                    "
-                  >
-                    Mobile number is required.
-                  </label>
-                  <label
-                    class="text-danger"
-                    *ngIf="
-                      !!captainForm.get('mobile').errors?.minlength &&
-                      captainForm.get('mobile').touched
-                    "
-                  >
-                    Mobile number is not valid.
-                  </label>
+                  <label>Platform <span class="text-danger">*</span></label>
+                  <select class="form-control" formControlName="platform">
+                    <option value="xbl" selected>Xbox Live</option>
+                    <option value="psn">PSN</option>
+                    <option value="battle">Battle.net</option>
+                  </select>
                 </div>
               </div>
             </div>
